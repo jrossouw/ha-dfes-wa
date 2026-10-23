@@ -20,6 +20,8 @@ jobs:
       - uses: hacs/action@main
         with:
           category: integration
+          # brands: needs a PR to home-assistant/brands; images: README has no screenshots yet
+          ignore: brands images
 
   tests:
     runs-on: ubuntu-latest

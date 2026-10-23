@@ -250,4 +250,4 @@ pytest tests tests_ha
 
 ## Data and licence
 
-Data comes from the public Emergency WA RSS feeds published by the Department of Fire and Emergency Services, Western Australia. This project is not affiliated with or endorsed by DFES. Released under the [MIT licence](LICENSE).
+Data comes from the public Emergency WA RSS feeds published by the Department of Fire and Emergency Services, Western Australia. This project is not affiliated with or endorsed by DFES. Released under the [GNU General Public License v3.0](LICENSE).
