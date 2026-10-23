@@ -1,6 +1,7 @@
 {
   "domain": "dfes_wa",
   "name": "DFES Emergency WA",
+  "categories": ["weather_alerts.public_warnings"],
   "codeowners": ["@jrossouw"],
   "config_flow": true,
   "documentation": "https://github.com/jrossouw/ha-dfes-wa",
