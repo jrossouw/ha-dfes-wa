@@ -1,0 +1,12 @@
+{
+  "domain": "dfes_wa",
+  "name": "DFES Emergency WA",
+  "codeowners": ["@jrossouw"],
+  "config_flow": true,
+  "documentation": "https://github.com/jrossouw/ha-dfes-wa",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/jrossouw/ha-dfes-wa/issues",
+  "requirements": [],
+  "version": "1.0.0"
+}

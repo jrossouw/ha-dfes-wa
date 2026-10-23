@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:georss="http://www.georss.org/georss" xmlns:dfes="https://emergency.wa.gov.au/dfes" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#">
+  <channel>
+    <title>DFES Fire Danger Ratings (All Regions)</title>
+    <link>https://www.emergency.wa.gov.au/</link>
+    <description/>
+    <item>
+      <title>Fire Danger Ratings for October 23, 2026</title>
+      <link>https://www.emergency.wa.gov.au/fire-danger-ratings</link>
+      <description><![CDATA[<div>
+<p><strong>The following alert has been issued by the Department of Fire and Emergency Services (DFES).</strong></p>
+<p>Time of issue: 04:10 PM<br />Date of issue: 23 October 2026</p>
+<p><strong>High Fire Danger Ratings have been forecast for the following districts on Friday 23 October 2026:</strong></p>
+<ul><li>Central Pilbara</li><li>Hedland</li></ul>
+<p><strong>Moderate Fire Danger Ratings have been forecast for the following districts on Friday 23 October 2026:</strong></p>
+<ul><li>Swan Coastal North</li><li> Swan Inland North </li><li>Avon</li></ul>
+<p><strong>No Fire Danger Ratings have been forecast for the following districts on Friday 23 October 2026:</strong></p>
+<ul><li>Perth Inner</li><li>Rottnest</li></ul>
+<br /><p><a href="https://www.emergency.wa.gov.au/">Emergency WA</a></p>
+<p>END Media Contact: DFES Media on 9395 9543.</p>
+</div>]]></description>
+      <pubDate>Fri, 23 Oct 2026 16:10:00 +0800</pubDate>
+      <dfes:publicationTime>Fri, 23 Oct 2026 16:10:00 +0800</dfes:publicationTime>
+      <geo:long>0.0</geo:long>
+      <geo:lat>0.0</geo:lat>
+    </item>
+    <item>
+      <title>Fire Danger Ratings for October 24, 2026</title>
+      <link>https://www.emergency.wa.gov.au/fire-danger-ratings</link>
+      <description><![CDATA[<div>
+<p><strong>Extreme Fire Danger Ratings have been forecast for the following districts on Saturday 24 October 2026:</strong></p>
+<ul><li>Hedland</li></ul>
+<p><strong>High Fire Danger Ratings have been forecast for the following districts on Saturday 24 October 2026:</strong></p>
+<ul><li>Swan Inland North</li><li>Central Pilbara</li></ul>
+<p><strong>Moderate Fire Danger Ratings have been forecast for the following districts on Saturday 24 October 2026:</strong></p>
+<ul><li>Swan Coastal North</li><li>Avon</li></ul>
+<p><strong>No Fire Danger Ratings have been forecast for the following districts on Saturday 24 October 2026:</strong></p>
+<ul><li>Perth Inner</li><li>Rottnest</li></ul>
+</div>]]></description>
+      <pubDate>Fri, 23 Oct 2026 16:10:00 +0800</pubDate>
+      <dfes:publicationTime>Fri, 23 Oct 2026 16:10:00 +0800</dfes:publicationTime>
+      <geo:long>0.0</geo:long>
+      <geo:lat>0.0</geo:lat>
+    </item>
+  </channel>
+</rss>

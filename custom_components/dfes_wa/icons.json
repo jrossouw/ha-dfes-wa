@@ -1,0 +1,34 @@
+{
+  "services": {
+    "select_pin": {
+      "service": "mdi:map-marker-check"
+    },
+    "clear_selection": {
+      "service": "mdi:map-marker-remove"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "fire_danger_today": {
+        "default": "mdi:gauge",
+        "state": {
+          "no_rating": "mdi:gauge-empty",
+          "moderate": "mdi:gauge-low",
+          "high": "mdi:gauge",
+          "extreme": "mdi:gauge-full",
+          "catastrophic": "mdi:alert-octagram"
+        }
+      },
+      "fire_danger_tomorrow": {
+        "default": "mdi:gauge",
+        "state": {
+          "no_rating": "mdi:gauge-empty",
+          "moderate": "mdi:gauge-low",
+          "high": "mdi:gauge",
+          "extreme": "mdi:gauge-full",
+          "catastrophic": "mdi:alert-octagram"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+select_pin:
+  fields:
+    pin:
+      required: true
+      example: geo_location.bushfire_muchea
+      selector:
+        entity:
+          domain: geo_location
+
+clear_selection:

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:georss="http://www.georss.org/georss">
+  <channel>
+    <title>Emergency WA Incidents</title>
+    <item>
+      <title>Burn Off (MUCHEA, SHIRE OF CHITTERING, METRO NORTH EAST, CAD-ID: 825904)</title>
+      <link>https://emergency.wa.gov.au/incidents/6adad8f25a47352fe58b7297</link>
+      <description>Burn Off &lt;region&gt;METRO NORTH EAST&lt;/region&gt;&lt;br&gt;
+    &lt;incidentNumber&gt;825904&lt;/incidentNumber&gt;
+    &lt;br&gt;
+    &lt;publicationTime&gt;Fri, 23 Oct 2026 11:47:57 +0800&lt;/publicationTime&gt;</description>
+      <pubDate>Fri, 23 Oct 2026 11:47:57 +0800</pubDate>
+      <guid isPermaLink="false">6adad8f25a47352fe58b7297</guid>
+      <geo:long>115.95153742</geo:long>
+      <geo:lat>-31.58184933</geo:lat>
+      <georss:polygon/>
+    </item>
+    <item>
+      <title>Structure Fire (BAMBUN, SHIRE OF GINGIN, METRO NORTH COASTAL, CAD-ID: 823841)</title>
+      <link>https://emergency.wa.gov.au/incidents/6aced1901d17de20df3ce24d</link>
+      <pubDate>Mon, 19 Oct 2026 13:07:51 +0800</pubDate>
+      <guid isPermaLink="false">6aced1901d17de20df3ce24d</guid>
+      <geo:long>115.9062197</geo:long>
+      <geo:lat>-31.45070299</geo:lat>
+    </item>
+    <item>
+      <title>Bushfire (DRYSDALE RIVER, unknown LGA, KIMBERLEY, CAD-ID: 825724)</title>
+      <link>https://emergency.wa.gov.au/incidents/6ad950baf7ffb4c7724c35a9</link>
+      <pubDate>Thu, 22 Oct 2026 07:57:57 +0800</pubDate>
+      <guid isPermaLink="false">6ad950baf7ffb4c7724c35a9</guid>
+      <geo:long>127.099768</geo:long>
+      <geo:lat>-14.944708</geo:lat>
+    </item>
+    <item>
+      <title>Road Crash (NO LOCATION, CITY OF NOWHERE, SOUTH WEST, CAD-ID: 1)</title>
+      <guid isPermaLink="false">noloc</guid>
+    </item>
+  </channel>
+</rss>

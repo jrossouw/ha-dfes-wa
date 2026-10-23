@@ -1,0 +1,132 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "DFES Emergency WA",
+        "description": "Track Emergency WA incidents and warnings around a location. Incidents inside the tracking radius appear on the Home Assistant map.",
+        "data": {
+          "name": "Name",
+          "location": "Location to watch",
+          "radius": "Tracking radius",
+          "alert_radius": "\"Fire nearby\" radius",
+          "exclude_burn_offs": "Ignore burn offs",
+          "fire_district": "Fire weather district"
+        },
+        "data_description": {
+          "radius": "Incidents and warnings within this distance are mapped and counted.",
+          "alert_radius": "The Fire nearby binary sensor turns on for fires (not burn offs) within this distance.",
+          "exclude_burn_offs": "Hide planned burn offs completely (map, sensors and events).",
+          "fire_district": "For the Fire danger rating sensors. Find yours on the Emergency WA Fire Danger Ratings page or the DFES list of districts by local council. Leave empty to skip."
+        }
+      }
+    },
+    "error": {
+      "outside_wa": "That location isn't in Western Australia."
+    },
+    "abort": {
+      "already_configured": "This location is already being tracked."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "DFES Emergency WA options",
+        "data": {
+          "radius": "Tracking radius",
+          "alert_radius": "\"Fire nearby\" radius",
+          "exclude_burn_offs": "Ignore burn offs",
+          "show_incidents_on_map": "Show incidents on the map",
+          "show_warnings_on_map": "Show warnings on the map",
+          "scan_interval": "Update interval",
+          "incidents_url": "Incidents feed URL",
+          "warnings_url": "Warnings feed URL",
+          "fire_district": "Fire weather district",
+          "fdr_url": "Fire danger ratings feed URL"
+        },
+        "data_description": {
+          "incidents_url": "Only change this if Emergency WA moves its RSS feed.",
+          "warnings_url": "Only change this if Emergency WA moves its RSS feed.",
+          "fire_district": "For the Fire danger rating sensors. Find yours on the Emergency WA Fire Danger Ratings page or the DFES list of districts by local council. Leave empty to skip.",
+          "fdr_url": "Only change this if Emergency WA moves its RSS feed."
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "incidents": {
+        "name": "Incidents nearby"
+      },
+      "warnings": {
+        "name": "Warnings nearby"
+      },
+      "nearest_incident": {
+        "name": "Nearest incident"
+      },
+      "nearest_fire": {
+        "name": "Nearest fire"
+      },
+      "nearest_warning": {
+        "name": "Nearest warning"
+      },
+      "statewide_incidents": {
+        "name": "Statewide incidents"
+      },
+      "selected": {
+        "name": "Selected on map"
+      },
+      "fire_danger_today": {
+        "name": "Fire danger rating today",
+        "state": {
+          "no_rating": "No rating",
+          "moderate": "Moderate",
+          "high": "High",
+          "extreme": "Extreme",
+          "catastrophic": "Catastrophic"
+        }
+      },
+      "fire_danger_tomorrow": {
+        "name": "Fire danger rating tomorrow",
+        "state": {
+          "no_rating": "No rating",
+          "moderate": "Moderate",
+          "high": "High",
+          "extreme": "Extreme",
+          "catastrophic": "Catastrophic"
+        }
+      }
+    },
+    "binary_sensor": {
+      "fire_nearby": {
+        "name": "Fire nearby"
+      },
+      "serious_warning": {
+        "name": "Watch and Act or Emergency Warning"
+      },
+      "home_in_warning_area": {
+        "name": "Home in warning area"
+      }
+    }
+  },
+  "services": {
+    "select_pin": {
+      "name": "Select map pin",
+      "description": "Shows an incident or warning in the Selected on map sensor, e.g. when its pin is tapped on a dashboard map.",
+      "fields": {
+        "pin": {
+          "name": "Map pin",
+          "description": "The DFES map pin (geo_location entity) to show."
+        }
+      }
+    },
+    "clear_selection": {
+      "name": "Clear map selection",
+      "description": "Clears the Selected on map sensor."
+    }
+  },
+  "exceptions": {
+    "not_a_pin": {
+      "message": "{pin} is not a DFES Emergency WA map pin."
+    }
+  }
+}

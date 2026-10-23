@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:georss="http://www.georss.org/georss" xmlns:dfes="https://emergency.wa.gov.au/dfes">
+  <channel>
+    <item>
+      <title>Bushfire Advice THREAT IS REDUCED - BURLONG AND NORTHAM</title>
+      <link>https://emergency.wa.gov.au/warnings/6ad9ae93b887329d31392989</link>
+      <description><![CDATA[<p>Bushfire Advice - THREAT IS REDUCED</p>]]></description>
+      <pubDate>Fri, 23 Oct 2026 10:29:11 +0800</pubDate>
+      <dfes:region>GOLDFIELDS MIDLANDS</dfes:region>
+      <dfes:incidentNumber>825781</dfes:incidentNumber>
+      <dfes:publicationTime>Fri, 23 Oct 2026 10:29:11 +0800</dfes:publicationTime>
+      <guid isPermaLink="false">6ad9ae93b887329d31392989</guid>
+      <geo:long>116.62533731068109</geo:long>
+      <geo:lat>-31.652883701995595</geo:lat>
+      <georss:alertLevel/>
+      <georss:polygon>-31.665038431453844,116.62571955129982 -31.64597300362719,116.60960726596568 -31.64232902616363,116.6410673553965 -31.663484569623577,116.62803820627971 -31.665038431453844,116.62571955129982</georss:polygon>
+    </item>
+    <item>
+      <title>Bushfire Watch and Act - TEST TOWN</title>
+      <link>https://emergency.wa.gov.au/warnings/test</link>
+      <guid isPermaLink="false">wa-test</guid>
+      <georss:polygon>-31.70,115.90 -31.70,116.00 -31.60,116.00 -31.60,115.90 -31.70,115.90</georss:polygon>
+    </item>
+  </channel>
+</rss>

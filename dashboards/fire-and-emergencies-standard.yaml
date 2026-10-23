@@ -1,0 +1,73 @@
+# DFES Emergency WA - "Fire and Emergencies" dashboard (standard)
+#
+# Built-in cards only - nothing else to install. Tapping a pin opens its
+# details dialog. For colour-coded pins, shaded warning areas and the
+# "Selected on map" panel, use fire-and-emergencies.yaml instead.
+#
+# Entity IDs assume the integration entry is named "DFES Home" (sensor.dfes_home_...).
+# If you named it something else, find-and-replace "dfes_home" with your prefix.
+#
+# How to use: Settings > Dashboards > Add dashboard > New dashboard from scratch,
+# open it, then ⋮ > Edit dashboard > ⋮ > Raw configuration editor, paste this file and Save.
+
+title: Fire and Emergencies
+views:
+- title: Fire Map
+  path: fire-map
+  icon: mdi:map-marker-alert
+  type: sections
+  max_columns: 3
+  sections:
+  - type: grid
+    column_span: 2
+    cards:
+    - type: markdown
+      text_only: true
+      grid_options:
+        columns: full
+      content: |-
+        ### <ha-icon icon="mdi:fire"></ha-icon> {% set r = state_attr('sensor.dfes_home_incidents_nearby', 'radius_km') %}{% if r %}Within {{ r | int }} km of home{% else %}Near home{% endif %}
+    - type: map
+      geo_location_sources:
+      - dfes_wa
+      entities:
+      - zone.home
+      hours_to_show: 0
+      default_zoom: 9
+      theme_mode: light
+      grid_options:
+        columns: full
+        rows: 9
+  - type: grid
+    cards:
+    - type: heading
+      heading: Status
+      icon: mdi:alert-circle-outline
+    - type: tile
+      entity: sensor.dfes_home_incidents_nearby
+      name: Active incidents
+    - type: tile
+      entity: binary_sensor.dfes_home_fire_nearby
+      name: Fire nearby
+    - type: tile
+      entity: sensor.dfes_home_warnings_nearby
+      name: Official warnings
+    - type: tile
+      entity: binary_sensor.dfes_home_watch_and_act_or_emergency_warning
+      name: Watch and Act / Emergency
+    - type: tile
+      entity: sensor.dfes_home_fire_danger_rating_today
+      name: Fire danger today
+    - type: tile
+      entity: sensor.dfes_home_fire_danger_rating_tomorrow
+      name: Fire danger tomorrow
+    - type: markdown
+      grid_options:
+        columns: full
+      content: "{% set w = state_attr('sensor.dfes_home_warnings_nearby', 'warnings') or [] %}\n{%- if w %}### Warnings\n{% for i in w %}**{{ i.alert_level or i.type }}** – {{ i.title | title }}  \n{{ i.distance_km\
+        \ }} km · [details]({{ i.link }})\n\n{% endfor %}{% else %}No official warnings near home.{% endif %}\n"
+    - type: markdown
+      grid_options:
+        columns: full
+      content: "{% set inc = state_attr('sensor.dfes_home_incidents_nearby', 'incidents') or [] %}\n{%- if inc %}### Current incidents\n{% for i in inc %}**{{ i.type }}** – {{ i.suburb }}  \n{{ i.distance_km\
+        \ }} km · {{ i.region }} · [details]({{ i.link }})\n\n{% endfor %}{% else %}No active incidents near home.{% endif %}\n"
