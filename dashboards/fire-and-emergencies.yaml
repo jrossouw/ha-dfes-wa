@@ -326,6 +326,7 @@ views:
         entity: binary_sensor.dfes_home_firefighting_aircraft_nearby
         state_not:
         - unavailable
+        - unknown
     - type: tile
       entity: sensor.dfes_home_emergency_aircraft_nearby
       name: Emergency aircraft
@@ -340,6 +341,7 @@ views:
         entity: sensor.dfes_home_emergency_aircraft_nearby
         state_not:
         - unavailable
+        - unknown
     - type: tile
       entity: switch.dfes_home_show_all_aircraft
       name: Show all aircraft

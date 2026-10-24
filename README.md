@@ -58,8 +58,8 @@ Two ready-made dashboards are in the [`dashboards`](dashboards) folder:
 
 | File | Needs | What you get |
 |---|---|---|
-| [`fire-and-emergencies.yaml`](dashboards/fire-and-emergencies.yaml) | map-card + auto-entities | Pins coloured by type and alert level, shaded warning areas, street map, a **Selected on map** panel when you tap a pin, an optional wind layer |
-| [`fire-and-emergencies-standard.yaml`](dashboards/fire-and-emergencies-standard.yaml) | Nothing extra | The built-in map card with all incident and warning pins. Tapping a pin opens its details dialog. |
+| [`fire-and-emergencies.yaml`](dashboards/fire-and-emergencies.yaml) | map-card + auto-entities | Pins coloured by type and alert level, shaded warning areas, street map, a **Selected on map** panel under the map when you tap a pin, an optional wind layer. Emergency aircraft point along their heading, are coloured by role and leave a trail; tapping one shows its details in the same panel |
+| [`fire-and-emergencies-standard.yaml`](dashboards/fire-and-emergencies-standard.yaml) | Nothing extra | The built-in map card with all incident, warning and aircraft pins. Tapping a pin opens its details dialog. |
 
 Both include a heading that follows your tracking radius ("Within 50 km of home") and a **Status** panel with:
 - active incidents
@@ -67,7 +67,10 @@ Both include a heading that follows your tracking radius ("Within 50 km of home"
 - official warnings
 - Watch and Act / Emergency
 - Fire Danger Rating today and tomorrow
+- firefighting aircraft nearby, emergency aircraft count and a **Show all aircraft** switch (shown only when emergency aircraft tracking is on)
 - lists of current warnings and incidents with links to Emergency WA
+
+The status tiles don't open the history dialog when tapped; the switches toggle.
 
 **To add one:**
 
