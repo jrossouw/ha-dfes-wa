@@ -245,37 +245,32 @@ views:
         state_not:
         - unknown
         - unavailable
-      content: |
-        {% set a = states.sensor.dfes_home_selected_on_map.attributes %}
-        {%- if a.get('cleared') %}This has cleared or left the area.
-        {%- elif a.get('pin') and a.kind == 'aircraft' %}
-        {% set roles = {'bomber': 'Water bomber', 'helitack': 'Helitack', 'air_attack': 'Air attack', 'rescue': 'Rescue', 'medical': 'Flying doctor', 'police': 'Police', 'other': 'Watched aircraft', 'general': 'Aircraft'} %}
-        ## {{ a.callsign or a.registration or (a.hex | upper) }}
-        **{{ roles.get(a.role, 'Aircraft') }}**{% if a.description %} · {{ a.description | title }}{% endif %}
+      content: |-
+        {% set a = states.sensor.dfes_home_selected_on_map.attributes %}{% set g = a.get %}{% if g('cleared') %}This has cleared or left the area.{% elif g('pin') and g('kind') == 'aircraft' %}{% set roles = {'bomber': 'Water bomber', 'helitack': 'Helitack', 'air_attack': 'Air attack', 'rescue': 'Rescue', 'medical': 'Flying doctor', 'police': 'Police', 'other': 'Watched aircraft', 'general': 'Aircraft'} %}{% set alt = g('altitude_ft') %}{% set spd = g('ground_speed_kmh') %}{% set hdg = g('heading') %}{% set vr = g('vertical_rate_fpm') %}
+        ## {{ g('callsign') or g('registration') or (g('hex', '') | upper) }}
+        **{{ roles.get(g('role'), 'Aircraft') }}**{% if g('description') %} · {{ g('description') | title }}{% endif %}
 
-        {% if a.registration %}- Registration: {{ a.registration }}
-        {% endif %}{% if a.aircraft_type %}- Type: {{ a.aircraft_type }}
-        {% endif %}- Altitude: {% if a.on_ground %}on the ground{% elif a.altitude_ft is number %}{{ '{:,}'.format(a.altitude_ft) }} ft{% else %}unknown{% endif %}
-        {% if a.ground_speed_kmh is number %}- Speed: {{ a.ground_speed_kmh }} km/h{% if a.heading is number %}, heading {{ a.heading }}°{% endif %}
-        {% endif %}{% if a.vertical_rate_fpm and not a.on_ground %}- {{ 'Climbing' if a.vertical_rate_fpm > 0 else 'Descending' }} at {{ '{:,}'.format(a.vertical_rate_fpm | abs) }} ft/min
-        {% endif %}- Distance from home: {{ a.distance_km }} km
-        {% if a.squawk %}- Squawk: {{ a.squawk }}
-        {% endif %}
-        [Live track on adsb.lol →]({{ a.link }})
-        {%- elif a.get('pin') %}{% set p = as_datetime(a.published) if a.published else none %}
-        ## {{ a.type or states('sensor.dfes_home_selected_on_map') }}
-        {% if a.kind == 'warning' %}**{{ a.alert_level or 'Warning' }}**
+        {% if g('registration') %}- Registration: {{ g('registration') }}
+        {% endif %}{% if g('aircraft_type') %}- Type: {{ g('aircraft_type') }}
+        {% endif %}- Altitude: {% if g('on_ground') %}on the ground{% elif alt is number %}{{ '{:,}'.format(alt) }} ft{% else %}unknown{% endif %}
+        {% if spd is number %}- Speed: {{ spd }} km/h{% if hdg is number %}, heading {{ hdg }}°{% endif %}
+        {% endif %}{% if vr and not g('on_ground') %}- {{ 'Climbing' if vr > 0 else 'Descending' }} at {{ '{:,}'.format(vr | abs) }} ft/min
+        {% endif %}{% if g('distance_km') is not none %}- Distance from home: {{ g('distance_km') }} km
+        {% endif %}{% if g('squawk') %}- Squawk: {{ g('squawk') }}
+        {% endif %}{% if g('link') %}
+        [Live track on adsb.lol →]({{ g('link') }}){% endif %}
+        {% elif g('pin') %}{% set p = as_datetime(g('published')) if g('published') else none %}## {{ g('type') or states('sensor.dfes_home_selected_on_map') }}
+        {% if g('kind') == 'warning' %}**{{ g('alert_level') or 'Warning' }}**
 
-        {{ a.title }}
-        {% else %}**{{ (a.suburb ~ (', ' ~ a.lga if a.lga else '')) | upper }}**
+        {{ g('title', '') }}
+        {% else %}**{{ (g('suburb', '') ~ (', ' ~ g('lga') if g('lga') else '')) | upper }}**
         {% endif %}
         {% if p %}- Time reported: {{ (p | as_local).strftime('%-I:%M %p, %A %-d %B') }}
-        {% endif %}- Distance from home: {{ a.distance_km }} km
-        {% if a.region %}- Region: {{ a.region }}
-        {% endif %}{% if a.incident_number %}- Incident number: {{ a.incident_number }}
+        {% endif %}{% if g('distance_km') is not none %}- Distance from home: {{ g('distance_km') }} km
+        {% endif %}{% if g('region') %}- Region: {{ g('region') }}
+        {% endif %}{% if g('incident_number') %}- Incident number: {{ g('incident_number') }}
         {% endif %}
-        {% if a.link %}[Full details on Emergency WA →]({{ a.link }}){% endif %}
-        {%- endif %}
+        {% if g('link') %}[Full details on Emergency WA →]({{ g('link') }}){% endif %}{% endif %}
   - type: grid
     cards:
     - type: heading
