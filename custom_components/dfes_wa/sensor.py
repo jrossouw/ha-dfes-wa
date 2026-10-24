@@ -21,7 +21,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from . import DfesConfigEntry
 from .const import FDR_COLOURS, FDR_LEVELS
 from .coordinator import DfesData
-from .entity import DfesEntity
+from .entity import DfesAircraftEntity, DfesEntity
 from .feed import FeedEntry
 
 MAX_LISTED = 25  # keep attributes well under the recorder's 16 KB limit
@@ -127,6 +127,8 @@ async def async_setup_entry(
     if coordinator.fire_district:
         entities.append(DfesFireDangerSensor(coordinator, 0))
         entities.append(DfesFireDangerSensor(coordinator, 1))
+    if coordinator.aircraft is not None:
+        entities.append(DfesAircraftCountSensor(coordinator.aircraft))
     async_add_entities(entities)
 
 
@@ -235,4 +237,35 @@ class DfesFireDangerSensor(DfesEntity, SensorEntity):
             attrs["colour"] = FDR_COLOURS[rating]
         if data is not None and data.fdr is not None and data.fdr.issued:
             attrs["issued"] = data.fdr.issued.isoformat()
+        return attrs
+
+
+class DfesAircraftCountSensor(DfesAircraftEntity, SensorEntity):
+    """Emergency aircraft within the aircraft radius, with a list."""
+
+    _attr_translation_key = "aircraft"
+    _attr_icon = "mdi:airplane-alert"
+    _attr_native_unit_of_measurement = "aircraft"
+    _attr_state_class = SensorStateClass.MEASUREMENT
+
+    def __init__(self, coordinator) -> None:
+        super().__init__(coordinator, "aircraft")
+
+    @property
+    def native_value(self) -> int | None:
+        data = self.coordinator.data
+        return None if data is None else len(data.aircraft)
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        data = self.coordinator.data
+        attrs: dict[str, Any] = {"radius_km": self.coordinator.radius}
+        if data is None:
+            return attrs
+        attrs["aircraft"] = [
+            {k: v for k, v in a.as_dict().items() if v is not None}
+            for a in data.aircraft[:MAX_LISTED]
+        ]
+        attrs["all_aircraft_in_area"] = data.total_in_area
+        attrs["feed"] = data.source
         return attrs

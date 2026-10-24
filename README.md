@@ -11,6 +11,7 @@ Western Australian **DFES / Emergency WA incidents, warnings and Fire Danger Rat
 
 - 🗺️ **Live map pins**: every incident and warning within your radius appears on the map and disappears when it clears.
 - 🟨 **Warning areas**: warnings carry their affected area, so maps can shade it the way Emergency WA does.
+- ✈️ **Emergency aircraft** (optional): water bombers, helitacks, air attack, RAC Rescue, RFDS and police aircraft move live on the map with trails, from free community ADS-B feeds.
 - 🔥 **Fire Danger Ratings**: today's and tomorrow's rating for your fire weather district.
 - 🚨 **Safety sensors**: fire nearby, Watch and Act / Emergency Warning in your area, and home inside a warning area.
 - 📏 **Nearest incident, fire and warning** distance sensors, plus counts with full lists.
@@ -49,7 +50,7 @@ Go to **Settings → Devices & services → Add integration → DFES Emergency W
 | Ignore burn offs | Off | Hides planned burns everywhere: map, sensors and events. |
 | Fire weather district | – | Optional. Adds the Fire Danger Rating sensors (see below). |
 
-Under **Configure** you can change all of these later. You can also hide incidents or warnings from the map, change the update interval (default 2 minutes), and override the feed URLs if Emergency WA ever moves them.
+Under **Configure** you can change all of these later. You can also hide incidents or warnings from the map, change the update interval (default 2 minutes), turn on emergency aircraft tracking (see below), and override the feed URLs if Emergency WA ever moves them.
 
 ## Dashboard
 
@@ -102,6 +103,41 @@ Entity IDs below assume the entry is named "DFES Home".
 - Every incident has `type`, `suburb`, `lga`, `region`, `incident_number`, `link` and `published`.
 - Warnings also have `alert_level` (`Advice`, `Watch and Act` or `Emergency Warning`).
 - Map pins for warnings that have an affected area carry it as a GeoJSON Feature in `geojson`.
+
+## Emergency aircraft
+
+Turn on **Track emergency aircraft** under **Configure** to put WA's emergency aircraft on the map as they fly. Positions come from the free, unfiltered community ADS-B feeds [adsb.lol](https://adsb.lol) (with [airplanes.live](https://airplanes.live) as a fallback). No account or API key is needed.
+
+Aircraft are recognised by the flight ID they broadcast:
+
+| Role | Flight IDs | Examples |
+|---|---|---|
+| `bomber` | `BMBR…` | Air Tractor AT-802s (BMBR601–619), large air tankers (BMBR132, BMBR138) |
+| `helitack` | `HLTK…` | Black Hawks, Bell 214s |
+| `air_attack` | `FBIR…`, `BDOG…`, `PKAR…`, `SPTR…` | Firebirds, Birddogs, Spotters |
+| `rescue` | `RSCU…` | RAC Rescue (RSCU651, RSCU652) |
+| `medical` | `FD` + 3 digits | Royal Flying Doctor Service |
+| `police` | `POL…`, `POLAIR` | WA Police Air Wing |
+| `other` | your list | Anything in **Extra aircraft to track** |
+
+**Extra aircraft to track** takes callsigns, registrations (`VH-ABC`) or ICAO hex codes (`7C1234`), separated by commas or new lines. Use it for aircraft that don't broadcast a recognisable flight ID.
+
+| Option | Default | Notes |
+|---|---|---|
+| Track emergency aircraft | Off | Adds the entities below |
+| Aircraft radius | 50 km | Up to 460 km |
+| Aircraft update interval | 30 s | Minimum 15 s. Please be kind to the free feeds. |
+| Extra aircraft to track | – | See above |
+
+**Entities:**
+- `geo_location.<callsign>`, for example `geo_location.bmbr611`: one per emergency aircraft in range, with `kind: aircraft`, `role`, `callsign`, `registration`, `aircraft_type`, `altitude_ft`, `on_ground`, `ground_speed_kmh`, `heading`, `vertical_rate_fpm`, `squawk` and a `link` to the live track. It moves with every update and is removed when the aircraft leaves the area. Because the entity keeps its ID while the aircraft is in range, map-card's `history_start` draws its trail.
+- `sensor.dfes_home_emergency_aircraft_nearby`: count, with the list (nearest first) in `aircraft`.
+- `binary_sensor.dfes_home_firefighting_aircraft_nearby`: on while a bomber, helitack or air attack aircraft is within the "fire nearby" radius.
+- Event `dfes_wa_aircraft_spotted`: fired when an emergency aircraft enters the aircraft radius, with the same data as the map pin plus `in_alert_radius`, `is_firefighting` and `config_entry_id`. Aircraft already in range at startup don't fire.
+
+The enhanced dashboard colours aircraft by role and draws a 30-minute trail. The standard dashboard shows them automatically.
+
+Coverage depends on volunteer receivers. Low-flying aircraft in the hills, or far from Perth, can drop in and out. Not every aircraft transmits ADS-B, and an aircraft can fly under a different flight ID.
 
 ## Fire Danger Ratings
 
@@ -223,6 +259,7 @@ conditions:
 - **Setup fails with "Could not parse … feed":** the log shows the start of what the feed returned. If Emergency WA has moved its feeds, update the URLs under **Configure**. The defaults are `https://api.emergency.wa.gov.au/v1/rss/incidents`, `…/warnings` and `…/fire-danger-ratings`.
 - **Something isn't on the map:** check that it's within your tracking radius. Planned burns are hidden if **Ignore burn offs** is on.
 - **Fire danger sensors missing:** choose a fire weather district under **Configure**.
+- **No aircraft showing:** check **Track emergency aircraft** is on and the radius is big enough. If both ADS-B feeds are down, the aircraft entities show as unavailable while incidents and warnings carry on.
 - **Debug logging:**
 
   ```yaml
@@ -246,7 +283,7 @@ pip install pytest pytest-homeassistant-custom-component
 pytest tests tests_ha
 ```
 
-`tests/` covers the feed parsers without Home Assistant. `tests_ha/` runs the full integration (setup and options, entities, map pins, events, actions and Fire Danger Ratings) in a Home Assistant test instance. GitHub Actions runs hassfest, the HACS validation check and the tests on every push.
+`tests/` covers the feed and ADS-B parsers without Home Assistant. `tests_ha/` runs the full integration (setup and options, entities, map pins, events, actions, Fire Danger Ratings and emergency aircraft) in a Home Assistant test instance. GitHub Actions runs hassfest, the HACS validation check and the tests on every push.
 
 ## Data and licence
 

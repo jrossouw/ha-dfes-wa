@@ -8,8 +8,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 
-from .const import DOMAIN
-from .coordinator import DfesCoordinator
+from .const import CONF_TRACK_AIRCRAFT, DOMAIN
+from .coordinator import AircraftCoordinator, DfesCoordinator, entry_option
 from .services import async_setup_services
 
 PLATFORMS: list[Platform] = [
@@ -34,6 +34,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: DfesConfigEntry) -> bool
     coordinator = DfesCoordinator(hass, entry)
     await coordinator.async_config_entry_first_refresh()
     entry.runtime_data = coordinator
+
+    if entry_option(entry, CONF_TRACK_AIRCRAFT, False):
+        coordinator.aircraft = AircraftCoordinator(hass, entry, coordinator)
+        # Not async_config_entry_first_refresh: an ADS-B outage must never stop
+        # incidents and warnings loading. Entities just start out unavailable.
+        await coordinator.aircraft.async_refresh()
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(_async_reload))

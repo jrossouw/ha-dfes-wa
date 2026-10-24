@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.0
+
+- **Emergency aircraft** (optional, off by default): water bombers, helitacks, air attack, RAC Rescue, RFDS and police aircraft as moving `geo_location` pins (`kind: aircraft`), from the free adsb.lol feed with airplanes.live as a fallback
+- Recognised by broadcast flight ID (`BMBR`, `HLTK`, `FBIR`, `BDOG`, `PKAR`, `SPTR`, `RSCU`, `FD`, `POL`), plus your own list of callsigns, registrations or hex codes
+- New entities: **Emergency aircraft nearby** sensor and **Firefighting aircraft nearby** binary sensor
+- New event: `dfes_wa_aircraft_spotted`
+- Options: aircraft radius, update interval (default 30 s) and extra aircraft
+- An ADS-B outage never affects incidents, warnings or Fire Danger Ratings
+- Enhanced dashboard: aircraft coloured by role with 30-minute trails
+
 ## 1.0.0
 
 First public release.

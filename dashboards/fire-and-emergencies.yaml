@@ -3,7 +3,8 @@
 # Requires these HACS frontend cards: map-card (nathan-gs/ha-map-card) and
 # auto-entities (thomasloven/lovelace-auto-entities).
 # Adds: colour-coded pins, shaded warning areas, tap a pin for its details
-# ("Selected on map" panel), Esri street map and an optional wind layer.
+# ("Selected on map" panel), Esri street map, an optional wind layer and, when
+# emergency aircraft tracking is on, moving aircraft with 30-minute trails.
 #
 # Entity IDs assume the integration entry is named "DFES Home" (sensor.dfes_home_...).
 # If you named it something else, find-and-replace "dfes_home" with your prefix.
@@ -101,6 +102,59 @@ views:
               service: dfes_wa.select_pin
               data:
                 pin: this.entity_id
+        # Emergency aircraft (turn on "Track emergency aircraft" in the integration
+        # options). Each one gets a trail of where it flew in the last 30 minutes.
+        - domain: geo_location
+          attributes:
+            source: dfes_wa
+            kind: aircraft
+            role: bomber
+          options:
+            display: icon
+            color: '#e65100'
+            size: 32
+            history_start: 30 minutes ago
+            history_line_color: '#e65100'
+            tap_action:
+              action: more-info
+        - domain: geo_location
+          attributes:
+            source: dfes_wa
+            kind: aircraft
+            role: helitack
+          options:
+            display: icon
+            color: '#c62828'
+            size: 32
+            history_start: 30 minutes ago
+            history_line_color: '#c62828'
+            tap_action:
+              action: more-info
+        - domain: geo_location
+          attributes:
+            source: dfes_wa
+            kind: aircraft
+            role: air_attack
+          options:
+            display: icon
+            color: '#6a1b9a'
+            size: 32
+            history_start: 30 minutes ago
+            history_line_color: '#6a1b9a'
+            tap_action:
+              action: more-info
+        - domain: geo_location
+          attributes:
+            source: dfes_wa
+            kind: aircraft
+          options:
+            display: icon
+            color: '#1565c0'
+            size: 32
+            history_start: 30 minutes ago
+            history_line_color: '#1565c0'
+            tap_action:
+              action: more-info
         - entity_id: zone.home
           options:
             display: icon
@@ -184,6 +238,22 @@ views:
     - type: tile
       entity: binary_sensor.dfes_home_watch_and_act_or_emergency_warning
       name: Watch and Act / Emergency
+    - type: tile
+      entity: binary_sensor.dfes_home_firefighting_aircraft_nearby
+      name: Firefighting aircraft nearby
+      visibility:
+      - condition: state
+        entity: binary_sensor.dfes_home_firefighting_aircraft_nearby
+        state_not:
+        - unavailable
+    - type: tile
+      entity: sensor.dfes_home_emergency_aircraft_nearby
+      name: Emergency aircraft
+      visibility:
+      - condition: state
+        entity: sensor.dfes_home_emergency_aircraft_nearby
+        state_not:
+        - unavailable
     - type: tile
       entity: sensor.dfes_home_fire_danger_rating_today
       name: Fire danger today

@@ -1,0 +1,27 @@
+{
+  "ac": [
+    {"hex": "7c6d2a", "type": "adsb_icao", "flight": "BMBR611 ", "r": "VH-RIM", "t": "AT8T",
+     "desc": "AIR TRACTOR AT-802", "alt_baro": 1200, "alt_geom": 1350, "gs": 142.3,
+     "track": 271.6, "baro_rate": -320, "squawk": "4000", "lat": -31.62, "lon": 116.01,
+     "seen_pos": 1.2, "seen": 0.4},
+    {"hex": "7c4f11", "type": "adsb_icao", "flight": "HLTK671", "r": "N1073W", "t": "B214",
+     "alt_baro": 800, "gs": 95, "track": 90, "lat": -31.60, "lon": 116.10, "seen_pos": 3},
+    {"hex": "7c0012", "type": "adsb_icao", "flight": "RSCU651", "r": "VH-8AR", "t": "A139",
+     "alt_baro": "ground", "gs": 0, "lat": -32.0975, "lon": 115.8811, "seen_pos": 0.5},
+    {"hex": "7c55aa", "flight": "FD624J", "r": "VH-VWO", "t": "PC24", "alt_baro": 24000,
+     "gs": 380, "lat": -31.70, "lon": 116.30, "seen_pos": 2},
+    {"hex": "7c6601", "flight": "POL61", "r": "VH-VQY", "t": "EC45", "alt_baro": 1500,
+     "lat": -31.95, "lon": 115.86, "seen_pos": 1},
+    {"hex": "7c1111", "flight": "QFA781", "r": "VH-VZA", "t": "B738", "alt_baro": 8000,
+     "gs": 250, "lat": -31.80, "lon": 116.00, "seen_pos": 1},
+    {"hex": "7c2222", "flight": "", "r": "VH-ABC", "t": "C172", "alt_baro": 2500,
+     "lat": -31.58, "lon": 116.05, "seen_pos": 4},
+    {"hex": "7c3333", "flight": "FBIR623", "r": "VH-YUQ", "t": "AS55",
+     "lat": -31.59, "lon": 116.07, "seen_pos": 95},
+    {"hex": "7c4444", "flight": "BMBR602", "r": "VH-FGO", "t": "AT8T"},
+    {"hex": "7c6d2a", "flight": "BMBR611", "lat": -31.0, "lon": 116.0, "seen_pos": 1}
+  ],
+  "msg": "No error",
+  "now": 1792800000000,
+  "total": 10
+}

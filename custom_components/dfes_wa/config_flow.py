@@ -12,6 +12,13 @@ from homeassistant.core import callback
 from homeassistant.helpers import selector
 
 from .const import (
+    CONF_AIRCRAFT_EXTRA,
+    CONF_AIRCRAFT_RADIUS,
+    CONF_AIRCRAFT_SCAN_INTERVAL,
+    CONF_TRACK_AIRCRAFT,
+    DEFAULT_AIRCRAFT_RADIUS,
+    DEFAULT_AIRCRAFT_SCAN_INTERVAL,
+    MIN_AIRCRAFT_SCAN_INTERVAL,
     CONF_ALERT_RADIUS,
     CONF_EXCLUDE_BURN_OFFS,
     CONF_FDR_URL,
@@ -89,6 +96,26 @@ def _options_schema(defaults: dict[str, Any]) -> vol.Schema:
                 )
             ),
             vol.Required(
+                CONF_TRACK_AIRCRAFT, default=defaults.get(CONF_TRACK_AIRCRAFT, False)
+            ): selector.BooleanSelector(),
+            vol.Required(
+                CONF_AIRCRAFT_RADIUS,
+                default=defaults.get(CONF_AIRCRAFT_RADIUS, DEFAULT_AIRCRAFT_RADIUS),
+            ): _km(1, 460),
+            vol.Required(
+                CONF_AIRCRAFT_SCAN_INTERVAL,
+                default=defaults.get(CONF_AIRCRAFT_SCAN_INTERVAL, DEFAULT_AIRCRAFT_SCAN_INTERVAL),
+            ): selector.NumberSelector(
+                selector.NumberSelectorConfig(
+                    min=MIN_AIRCRAFT_SCAN_INTERVAL, max=600, step=5, unit_of_measurement="s",
+                    mode=selector.NumberSelectorMode.BOX,
+                )
+            ),
+            vol.Optional(
+                CONF_AIRCRAFT_EXTRA,
+                description={"suggested_value": defaults.get(CONF_AIRCRAFT_EXTRA, "")},
+            ): selector.TextSelector(selector.TextSelectorConfig(multiline=True)),
+            vol.Required(
                 CONF_INCIDENTS_URL, default=defaults.get(CONF_INCIDENTS_URL, DEFAULT_INCIDENTS_URL)
             ): selector.TextSelector(selector.TextSelectorConfig(type=selector.TextSelectorType.URL)),
             vol.Required(
@@ -163,6 +190,10 @@ class DfesOptionsFlow(OptionsFlow):
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         if user_input is not None:
             user_input[CONF_SCAN_INTERVAL] = int(user_input[CONF_SCAN_INTERVAL])
+            if CONF_AIRCRAFT_SCAN_INTERVAL in user_input:
+                user_input[CONF_AIRCRAFT_SCAN_INTERVAL] = int(user_input[CONF_AIRCRAFT_SCAN_INTERVAL])
+            if not (user_input.get(CONF_AIRCRAFT_EXTRA) or "").strip():
+                user_input.pop(CONF_AIRCRAFT_EXTRA, None)
             if not user_input.get(CONF_FIRE_DISTRICT):
                 user_input.pop(CONF_FIRE_DISTRICT, None)
             return self.async_create_entry(data=user_input)
