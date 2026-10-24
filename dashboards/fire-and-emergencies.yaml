@@ -30,7 +30,8 @@ views:
       content: |-
         ### <ha-icon icon="mdi:fire"></ha-icon> {% set r = state_attr('sensor.dfes_home_incidents_nearby', 'radius_km') %}{% if r %}Within {{ r | int }} km of home{% else %}Near home{% endif %}
     - type: custom:auto-entities
-      unique: true
+      # 'entity' (not true): a pin matching several rules is drawn once, by the first rule
+      unique: entity
       grid_options:
         columns: full
         rows: 9
@@ -112,8 +113,8 @@ views:
             role: bomber
           options:
             display: marker
-            css: 'background: none; border: none; box-shadow: none;'
-            color: '#e65100'
+            css: '--card-background-color: transparent;'
+            color: transparent
             size: 32
             history_start: 30 minutes ago
             history_line_color: '#e65100'
@@ -126,8 +127,8 @@ views:
             role: helitack
           options:
             display: marker
-            css: 'background: none; border: none; box-shadow: none;'
-            color: '#c62828'
+            css: '--card-background-color: transparent;'
+            color: transparent
             size: 32
             history_start: 30 minutes ago
             history_line_color: '#c62828'
@@ -140,8 +141,8 @@ views:
             role: air_attack
           options:
             display: marker
-            css: 'background: none; border: none; box-shadow: none;'
-            color: '#6a1b9a'
+            css: '--card-background-color: transparent;'
+            color: transparent
             size: 32
             history_start: 30 minutes ago
             history_line_color: '#6a1b9a'
@@ -155,8 +156,8 @@ views:
             role: general
           options:
             display: marker
-            css: 'background: none; border: none; box-shadow: none;'
-            color: '#757575'
+            css: '--card-background-color: transparent;'
+            color: transparent
             size: 24
             history_start: 10 minutes ago
             history_line_color: '#9e9e9e'
@@ -168,8 +169,8 @@ views:
             kind: aircraft
           options:
             display: marker
-            css: 'background: none; border: none; box-shadow: none;'
-            color: '#1565c0'
+            css: '--card-background-color: transparent;'
+            color: transparent
             size: 32
             history_start: 30 minutes ago
             history_line_color: '#1565c0'
