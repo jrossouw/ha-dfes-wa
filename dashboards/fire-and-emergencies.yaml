@@ -279,18 +279,48 @@ views:
     - type: tile
       entity: sensor.dfes_home_incidents_nearby
       name: Active incidents
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
     - type: tile
       entity: binary_sensor.dfes_home_fire_nearby
       name: Fire nearby
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
     - type: tile
       entity: sensor.dfes_home_warnings_nearby
       name: Official warnings
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
     - type: tile
       entity: binary_sensor.dfes_home_watch_and_act_or_emergency_warning
       name: Watch and Act / Emergency
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
     - type: tile
       entity: binary_sensor.dfes_home_firefighting_aircraft_nearby
       name: Firefighting aircraft nearby
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
       visibility:
       - condition: state
         entity: binary_sensor.dfes_home_firefighting_aircraft_nearby
@@ -299,6 +329,12 @@ views:
     - type: tile
       entity: sensor.dfes_home_emergency_aircraft_nearby
       name: Emergency aircraft
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
       visibility:
       - condition: state
         entity: sensor.dfes_home_emergency_aircraft_nearby
@@ -320,9 +356,21 @@ views:
     - type: tile
       entity: sensor.dfes_home_fire_danger_rating_today
       name: Fire danger today
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
     - type: tile
       entity: sensor.dfes_home_fire_danger_rating_tomorrow
       name: Fire danger tomorrow
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
     - type: markdown
       grid_options:
         columns: full
