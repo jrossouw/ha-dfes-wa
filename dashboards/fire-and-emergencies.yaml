@@ -1,9 +1,10 @@
-# DFES Emergency WA - "Fire and Emergencies" dashboard (enhanced)
+# DFES Emergency WA - "Fires and Incidents" dashboard (enhanced)
 #
 # Requires these HACS frontend cards: map-card (nathan-gs/ha-map-card) and
 # auto-entities (thomasloven/lovelace-auto-entities).
 # Adds: colour-coded pins, shaded warning areas, tap a pin for its details
-# ("Selected on map" panel), Esri street map and an optional wind layer.
+# ("Selected on map" panel), Esri street map, an optional wind layer and, when
+# emergency aircraft tracking is on, moving aircraft with 30-minute trails.
 #
 # Entity IDs assume the integration entry is named "DFES Home" (sensor.dfes_home_...).
 # If you named it something else, find-and-replace "dfes_home" with your prefix.
@@ -11,9 +12,9 @@
 # How to use: Settings > Dashboards > Add dashboard > New dashboard from scratch,
 # open it, then ⋮ > Edit dashboard > ⋮ > Raw configuration editor, paste this file and Save.
 
-title: Fire and Emergencies
+title: Fires and Incidents
 views:
-- title: Fire Map
+- title: Fires and Incidents
   path: fire-map
   icon: mdi:map-marker-alert
   type: sections
@@ -29,7 +30,8 @@ views:
       content: |-
         ### <ha-icon icon="mdi:fire"></ha-icon> {% set r = state_attr('sensor.dfes_home_incidents_nearby', 'radius_km') %}{% if r %}Within {{ r | int }} km of home{% else %}Near home{% endif %}
     - type: custom:auto-entities
-      unique: true
+      # 'entity' (not true): a pin matching several rules is drawn once, by the first rule
+      unique: entity
       grid_options:
         columns: full
         rows: 9
@@ -101,6 +103,99 @@ views:
               service: dfes_wa.select_pin
               data:
                 pin: this.entity_id
+        # Emergency aircraft (turn on "Track emergency aircraft" in the integration
+        # options). Each is drawn pointing along its heading (display: marker uses
+        # the integration's picture) with a trail of the last 30 minutes.
+        - domain: geo_location
+          attributes:
+            source: dfes_wa
+            kind: aircraft
+            role: bomber
+          options:
+            display: marker
+            css: '--card-background-color: transparent;'
+            color: transparent
+            size: 32
+            history_start: 30 minutes ago
+            history_line_color: '#e65100'
+            history_show_dots: false
+            tap_action:
+              action: call-service
+              service: dfes_wa.select_pin
+              data:
+                pin: this.entity_id
+        - domain: geo_location
+          attributes:
+            source: dfes_wa
+            kind: aircraft
+            role: helitack
+          options:
+            display: marker
+            css: '--card-background-color: transparent;'
+            color: transparent
+            size: 32
+            history_start: 30 minutes ago
+            history_line_color: '#c62828'
+            history_show_dots: false
+            tap_action:
+              action: call-service
+              service: dfes_wa.select_pin
+              data:
+                pin: this.entity_id
+        - domain: geo_location
+          attributes:
+            source: dfes_wa
+            kind: aircraft
+            role: air_attack
+          options:
+            display: marker
+            css: '--card-background-color: transparent;'
+            color: transparent
+            size: 32
+            history_start: 30 minutes ago
+            history_line_color: '#6a1b9a'
+            history_show_dots: false
+            tap_action:
+              action: call-service
+              service: dfes_wa.select_pin
+              data:
+                pin: this.entity_id
+        # Other aircraft, only shown with "Show all aircraft" on: grey, shorter trail.
+        - domain: geo_location
+          attributes:
+            source: dfes_wa
+            kind: aircraft
+            role: general
+          options:
+            display: marker
+            css: '--card-background-color: transparent;'
+            color: transparent
+            size: 24
+            history_start: 10 minutes ago
+            history_line_color: '#9e9e9e'
+            history_show_dots: false
+            tap_action:
+              action: call-service
+              service: dfes_wa.select_pin
+              data:
+                pin: this.entity_id
+        - domain: geo_location
+          attributes:
+            source: dfes_wa
+            kind: aircraft
+          options:
+            display: marker
+            css: '--card-background-color: transparent;'
+            color: transparent
+            size: 32
+            history_start: 30 minutes ago
+            history_line_color: '#1565c0'
+            history_show_dots: false
+            tap_action:
+              action: call-service
+              service: dfes_wa.select_pin
+              data:
+                pin: this.entity_id
         - entity_id: zone.home
           options:
             display: icon
@@ -124,11 +219,6 @@ views:
         #       opacity: 0.6
         #       maxZoom: 16
         #       attribution: Wind &copy; <a href="https://openweathermap.org/">OpenWeatherMap</a>
-  - type: grid
-    cards:
-    - type: heading
-      heading: Status
-      icon: mdi:alert-circle-outline
     - type: heading
       heading: Selected on map
       heading_style: subtitle
@@ -155,41 +245,134 @@ views:
         state_not:
         - unknown
         - unavailable
-      content: |
-        {% set a = states.sensor.dfes_home_selected_on_map.attributes %}
-        {%- if a.get('cleared') %}This incident has cleared.
-        {%- elif a.get('pin') %}{% set p = as_datetime(a.published) if a.published else none %}
-        ## {{ a.type or states('sensor.dfes_home_selected_on_map') }}
-        {% if a.kind == 'warning' %}**{{ a.alert_level or 'Warning' }}**
+      content: |-
+        {% set a = states.sensor.dfes_home_selected_on_map.attributes %}{% set g = a.get %}{% if g('cleared') %}This has cleared or left the area.{% elif g('pin') and g('kind') == 'aircraft' %}{% set roles = {'bomber': 'Water bomber', 'helitack': 'Helitack', 'air_attack': 'Air attack', 'rescue': 'Rescue', 'medical': 'Flying doctor', 'police': 'Police', 'other': 'Watched aircraft', 'general': 'Aircraft'} %}{% set alt = g('altitude_ft') %}{% set spd = g('ground_speed_kmh') %}{% set hdg = g('heading') %}{% set vr = g('vertical_rate_fpm') %}
+        ## {{ g('callsign') or g('registration') or (g('hex', '') | upper) }}
+        **{{ roles.get(g('role'), 'Aircraft') }}**{% if g('description') %} · {{ g('description') | title }}{% endif %}
 
-        {{ a.title }}
-        {% else %}**{{ (a.suburb ~ (', ' ~ a.lga if a.lga else '')) | upper }}**
+        {% if g('registration') %}- Registration: {{ g('registration') }}
+        {% endif %}{% if g('aircraft_type') %}- Type: {{ g('aircraft_type') }}
+        {% endif %}- Altitude: {% if g('on_ground') %}on the ground{% elif alt is number %}{{ '{:,}'.format(alt) }} ft{% else %}unknown{% endif %}
+        {% if spd is number %}- Speed: {{ spd }} km/h{% if hdg is number %}, heading {{ hdg }}°{% endif %}
+        {% endif %}{% if vr and not g('on_ground') %}- {{ 'Climbing' if vr > 0 else 'Descending' }} at {{ '{:,}'.format(vr | abs) }} ft/min
+        {% endif %}{% if g('distance_km') is not none %}- Distance from home: {{ g('distance_km') }} km
+        {% endif %}{% if g('squawk') %}- Squawk: {{ g('squawk') }}
+        {% endif %}{% if g('link') %}
+        [Live track on adsb.lol →]({{ g('link') }}){% endif %}
+        {% elif g('pin') %}{% set p = as_datetime(g('published')) if g('published') else none %}## {{ g('type') or states('sensor.dfes_home_selected_on_map') }}
+        {% if g('kind') == 'warning' %}**{{ g('alert_level') or 'Warning' }}**
+
+        {{ g('title', '') }}
+        {% else %}**{{ (g('suburb', '') ~ (', ' ~ g('lga') if g('lga') else '')) | upper }}**
         {% endif %}
         {% if p %}- Time reported: {{ (p | as_local).strftime('%-I:%M %p, %A %-d %B') }}
-        {% endif %}- Distance from home: {{ a.distance_km }} km
-        {% if a.region %}- Region: {{ a.region }}
-        {% endif %}{% if a.incident_number %}- Incident number: {{ a.incident_number }}
+        {% endif %}{% if g('distance_km') is not none %}- Distance from home: {{ g('distance_km') }} km
+        {% endif %}{% if g('region') %}- Region: {{ g('region') }}
+        {% endif %}{% if g('incident_number') %}- Incident number: {{ g('incident_number') }}
         {% endif %}
-        {% if a.link %}[Full details on Emergency WA →]({{ a.link }}){% endif %}
-        {%- endif %}
+        {% if g('link') %}[Full details on Emergency WA →]({{ g('link') }}){% endif %}{% endif %}
+  - type: grid
+    cards:
+    - type: heading
+      heading: Status
+      icon: mdi:alert-circle-outline
     - type: tile
       entity: sensor.dfes_home_incidents_nearby
       name: Active incidents
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
     - type: tile
       entity: binary_sensor.dfes_home_fire_nearby
       name: Fire nearby
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
     - type: tile
       entity: sensor.dfes_home_warnings_nearby
       name: Official warnings
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
     - type: tile
       entity: binary_sensor.dfes_home_watch_and_act_or_emergency_warning
       name: Watch and Act / Emergency
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
+    - type: tile
+      entity: binary_sensor.dfes_home_firefighting_aircraft_nearby
+      name: Firefighting aircraft nearby
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
+      visibility:
+      - condition: state
+        entity: binary_sensor.dfes_home_firefighting_aircraft_nearby
+        state_not:
+        - unavailable
+        - unknown
+    - type: tile
+      entity: sensor.dfes_home_emergency_aircraft_nearby
+      name: Emergency aircraft
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
+      visibility:
+      - condition: state
+        entity: sensor.dfes_home_emergency_aircraft_nearby
+        state_not:
+        - unavailable
+        - unknown
+    - type: tile
+      entity: switch.dfes_home_show_all_aircraft
+      name: Show all aircraft
+      tap_action:
+        action: toggle
+      icon_tap_action:
+        action: toggle
+      visibility:
+      - condition: state
+        entity: switch.dfes_home_show_all_aircraft
+        state_not:
+        - unavailable
+        - unknown
     - type: tile
       entity: sensor.dfes_home_fire_danger_rating_today
       name: Fire danger today
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
     - type: tile
       entity: sensor.dfes_home_fire_danger_rating_tomorrow
       name: Fire danger tomorrow
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
     - type: markdown
       grid_options:
         columns: full

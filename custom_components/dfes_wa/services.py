@@ -42,10 +42,10 @@ def async_setup_services(hass: HomeAssistant) -> None:
                 translation_placeholders={"pin": pin},
             )
         external_id = state.attributes.get("external_id")
-        # Every location that can see this incident shows it; the rest clear.
+        # Every location that can see this incident (or aircraft) shows it;
+        # the rest clear.
         for coordinator in _coordinators(hass):
-            data = coordinator.data
-            if external_id and data is not None and data.get(external_id):
+            if external_id and coordinator.lookup(external_id):
                 coordinator.select(external_id, pin)
             else:
                 coordinator.select(None)

@@ -11,7 +11,7 @@ pkg = types.ModuleType("dfes_wa")
 pkg.__path__ = [str(PKG_DIR)]
 sys.modules["dfes_wa"] = pkg
 
-for name in ("const", "feed"):
+for name in ("const", "feed", "aircraft"):
     spec = importlib.util.spec_from_file_location(f"dfes_wa.{name}", PKG_DIR / f"{name}.py")
     mod = importlib.util.module_from_spec(spec)
     sys.modules[f"dfes_wa.{name}"] = mod

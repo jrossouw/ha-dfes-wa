@@ -1,7 +1,8 @@
-# DFES Emergency WA - "Fire and Emergencies" dashboard (standard)
+# DFES Emergency WA - "Fires and Incidents" dashboard (standard)
 #
 # Built-in cards only - nothing else to install. Tapping a pin opens its
-# details dialog. For colour-coded pins, shaded warning areas and the
+# details dialog. Emergency aircraft (if tracked) appear on the map with the
+# incidents, and their tiles show up in the Status column. For colour-coded pins, shaded warning areas and the
 # "Selected on map" panel, use fire-and-emergencies.yaml instead.
 #
 # Entity IDs assume the integration entry is named "DFES Home" (sensor.dfes_home_...).
@@ -10,9 +11,9 @@
 # How to use: Settings > Dashboards > Add dashboard > New dashboard from scratch,
 # open it, then ⋮ > Edit dashboard > ⋮ > Raw configuration editor, paste this file and Save.
 
-title: Fire and Emergencies
+title: Fires and Incidents
 views:
-- title: Fire Map
+- title: Fires and Incidents
   path: fire-map
   icon: mdi:map-marker-alert
   type: sections
@@ -46,21 +47,101 @@ views:
     - type: tile
       entity: sensor.dfes_home_incidents_nearby
       name: Active incidents
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
     - type: tile
       entity: binary_sensor.dfes_home_fire_nearby
       name: Fire nearby
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
     - type: tile
       entity: sensor.dfes_home_warnings_nearby
       name: Official warnings
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
     - type: tile
       entity: binary_sensor.dfes_home_watch_and_act_or_emergency_warning
       name: Watch and Act / Emergency
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
+    # Emergency aircraft tiles: shown only when "Track emergency aircraft" is on.
+    - type: tile
+      entity: binary_sensor.dfes_home_firefighting_aircraft_nearby
+      name: Firefighting aircraft nearby
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
+      visibility:
+      - condition: state
+        entity: binary_sensor.dfes_home_firefighting_aircraft_nearby
+        state_not:
+        - unavailable
+        - unknown
+    - type: tile
+      entity: sensor.dfes_home_emergency_aircraft_nearby
+      name: Emergency aircraft
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
+      visibility:
+      - condition: state
+        entity: sensor.dfes_home_emergency_aircraft_nearby
+        state_not:
+        - unavailable
+        - unknown
+    - type: tile
+      entity: switch.dfes_home_show_all_aircraft
+      name: Show all aircraft
+      tap_action:
+        action: toggle
+      icon_tap_action:
+        action: toggle
+      visibility:
+      - condition: state
+        entity: switch.dfes_home_show_all_aircraft
+        state_not:
+        - unavailable
+        - unknown
     - type: tile
       entity: sensor.dfes_home_fire_danger_rating_today
       name: Fire danger today
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
     - type: tile
       entity: sensor.dfes_home_fire_danger_rating_tomorrow
       name: Fire danger tomorrow
+      tap_action:
+        action: none
+      icon_tap_action:
+        action: none
+      hold_action:
+        action: none
     - type: markdown
       grid_options:
         columns: full

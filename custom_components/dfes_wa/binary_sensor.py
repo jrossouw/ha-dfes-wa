@@ -15,9 +15,9 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DfesConfigEntry
-from .const import CONF_ALERT_RADIUS, DEFAULT_ALERT_RADIUS
+from .const import CONF_ALERT_RADIUS, DEFAULT_ALERT_RADIUS, FIREFIGHTING_ROLES
 from .coordinator import DfesCoordinator, DfesData, entry_option
-from .entity import DfesEntity
+from .entity import DfesAircraftEntity, DfesEntity
 from .feed import FeedEntry
 
 
@@ -77,7 +77,12 @@ async def async_setup_entry(
 ) -> None:
     """Set up binary sensors."""
     coordinator = entry.runtime_data
-    async_add_entities(DfesBinarySensor(coordinator, d) for d in BINARY_SENSORS)
+    entities: list[BinarySensorEntity] = [
+        DfesBinarySensor(coordinator, d) for d in BINARY_SENSORS
+    ]
+    if coordinator.aircraft is not None:
+        entities.append(DfesFirefightingAircraftSensor(coordinator.aircraft))
+    async_add_entities(entities)
 
 
 class DfesBinarySensor(DfesEntity, BinarySensorEntity):
@@ -111,3 +116,49 @@ class DfesBinarySensor(DfesEntity, BinarySensorEntity):
         if self.entity_description.key == "fire_nearby":
             attrs["alert_radius_km"] = self._alert_radius
         return attrs
+
+
+class DfesFirefightingAircraftSensor(DfesAircraftEntity, BinarySensorEntity):
+    """On while water bombers, helitacks or air attack aircraft are close.
+
+    Uses the "fire nearby" alert radius, so it means firefighting aircraft
+    are working within that distance of the location.
+    """
+
+    _attr_translation_key = "firefighting_aircraft_nearby"
+    _attr_icon = "mdi:airplane-alert"
+
+    def __init__(self, coordinator) -> None:
+        super().__init__(coordinator, "firefighting_aircraft_nearby")
+
+    @property
+    def _alert_radius(self) -> float:
+        return float(
+            entry_option(self.coordinator.config_entry, CONF_ALERT_RADIUS, DEFAULT_ALERT_RADIUS)
+        )
+
+    def _matches(self):
+        data = self.coordinator.data
+        if data is None:
+            return []
+        radius = self._alert_radius
+        return [
+            a for a in data.aircraft
+            if a.role in FIREFIGHTING_ROLES and (a.distance or 0) <= radius
+        ]
+
+    @property
+    def is_on(self) -> bool | None:
+        if self.coordinator.data is None:
+            return None
+        return bool(self._matches())
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        return {
+            "alert_radius_km": self._alert_radius,
+            "matches": [
+                {k: v for k, v in a.as_dict().items() if v is not None}
+                for a in self._matches()[:10]
+            ],
+        }

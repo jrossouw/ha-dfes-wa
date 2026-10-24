@@ -51,6 +51,85 @@ KIND_WARNING: Final = "warning"
 
 SIGNAL_NEW_ENTRIES: Final = f"{DOMAIN}_new_entries_{{}}"
 
+# -- Emergency aircraft (ADS-B) ---------------------------------------------
+# Live positions come from free, unfiltered community ADS-B feeds (readsb JSON).
+# The first URL that answers wins; {lat}/{lon}/{radius} are filled in, with the
+# radius in nautical miles (both feeds cap it at 250 nm).
+ADSB_URLS: Final = (
+    "https://api.adsb.lol/v2/point/{lat}/{lon}/{radius}",
+    "https://api.airplanes.live/v2/point/{lat}/{lon}/{radius}",
+)
+ADSB_ATTRIBUTION: Final = "Aircraft positions © adsb.lol / airplanes.live contributors (ODbL)"
+ADSB_MAX_RADIUS_NM: Final = 250
+
+CONF_TRACK_AIRCRAFT: Final = "track_aircraft"
+CONF_AIRCRAFT_RADIUS: Final = "aircraft_radius"
+CONF_AIRCRAFT_SCAN_INTERVAL: Final = "aircraft_scan_interval"
+CONF_AIRCRAFT_EXTRA: Final = "aircraft_extra"
+CONF_SHOW_ALL_AIRCRAFT: Final = "show_all_aircraft"
+
+DEFAULT_AIRCRAFT_RADIUS: Final = 50.0  # km
+DEFAULT_AIRCRAFT_SCAN_INTERVAL: Final = 30  # seconds
+MIN_AIRCRAFT_SCAN_INTERVAL: Final = 15  # be kind to the free feeds
+# Positions older than this are dropped (the feed keeps aircraft for a while
+# after they go out of receiver range).
+AIRCRAFT_STALE_SECONDS: Final = 60
+
+KIND_AIRCRAFT: Final = "aircraft"
+EVENT_AIRCRAFT_SPOTTED: Final = f"{DOMAIN}_aircraft_spotted"
+
+# Roles, and the ADS-B flight IDs (callsigns) WA emergency aircraft use.
+# Flight IDs are at most 8 characters, so the spoken callsign is abbreviated:
+# "Bomber 611" broadcasts BMBR611, "Firebird 623" FBIR623, and so on.
+ROLE_BOMBER: Final = "bomber"
+ROLE_HELITACK: Final = "helitack"
+ROLE_AIR_ATTACK: Final = "air_attack"
+ROLE_RESCUE: Final = "rescue"
+ROLE_MEDICAL: Final = "medical"
+ROLE_POLICE: Final = "police"
+ROLE_OTHER: Final = "other"  # matched only by the user's extra list
+ROLE_GENERAL: Final = "general"  # everything else, only with "show all aircraft"
+
+AIRCRAFT_ROLES: Final = (
+    ROLE_BOMBER, ROLE_HELITACK, ROLE_AIR_ATTACK, ROLE_RESCUE,
+    ROLE_MEDICAL, ROLE_POLICE, ROLE_OTHER, ROLE_GENERAL,
+)
+# Firefighting roles feed the "Firefighting aircraft nearby" binary sensor.
+FIREFIGHTING_ROLES: Final = (ROLE_BOMBER, ROLE_HELITACK, ROLE_AIR_ATTACK)
+
+# (role, regex on the flight ID). Checked in order; first match wins.
+CALLSIGN_PATTERNS: Final = (
+    (ROLE_BOMBER, r"^(BMBR|BOMB|BOMBER)\d+[A-Z]?$"),
+    (ROLE_HELITACK, r"^(HLTK|HTAK|HELTAK|HELITAK|HELITACK)\d+[A-Z]?$"),
+    (ROLE_AIR_ATTACK, r"^(FBIR|FIREBIRD|BDOG|BIRDDOG|PKAR|SPTR|SPOTTER|AATK|AIRATK)\d+[A-Z]?$"),
+    (ROLE_RESCUE, r"^(RSCU|RESU|RESCUE)\d+[A-Z]?$"),
+    (ROLE_MEDICAL, r"^FD\d{3}[A-Z]?$"),  # Royal Flying Doctor Service WA
+    (ROLE_POLICE, r"^(POL\d+[A-Z]?|POLAIR\d*)$"),
+)
+
+# Marker colours, matching the enhanced dashboard's trail colours.
+ROLE_COLOURS: Final = {
+    ROLE_BOMBER: "#e65100",
+    ROLE_HELITACK: "#c62828",
+    ROLE_AIR_ATTACK: "#6a1b9a",
+    ROLE_RESCUE: "#1565c0",
+    ROLE_MEDICAL: "#1565c0",
+    ROLE_POLICE: "#1565c0",
+    ROLE_OTHER: "#1565c0",
+    ROLE_GENERAL: "#616161",
+}
+
+ROLE_ICONS: Final = {
+    ROLE_BOMBER: "mdi:airplane",
+    ROLE_HELITACK: "mdi:helicopter",
+    ROLE_AIR_ATTACK: "mdi:airplane-search",
+    ROLE_RESCUE: "mdi:helicopter",
+    ROLE_MEDICAL: "mdi:medical-bag",
+    ROLE_POLICE: "mdi:police-badge",
+    ROLE_OTHER: "mdi:airplane-alert",
+    ROLE_GENERAL: "mdi:airplane",
+}
+
 # Fire Danger Ratings (Australian Fire Danger Rating System), lowest to highest.
 FDR_LEVELS: Final = ("no_rating", "moderate", "high", "extreme", "catastrophic")
 FDR_COLOURS: Final = {
