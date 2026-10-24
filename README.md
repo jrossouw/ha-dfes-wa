@@ -139,6 +139,16 @@ Aircraft are recognised by the flight ID they broadcast:
 
 The enhanced dashboard points each aircraft along its heading, shows its details (registration, type, altitude, speed, climb rate, squawk and a live-track link) in the **Selected on map** panel when tapped, colours it by role and draws a 30-minute trail (other aircraft are small, grey and keep a 10-minute trail). The standard dashboard shows them automatically.
 
+**Optional: a trails on/off switch.** Map-card can take the trail length from an entity and redraws when it changes. Create a Toggle helper (`input_boolean.aircraft_trails`) and a Template sensor helper (`sensor.aircraft_trail_minutes`) with the state `{{ 30 if is_state('input_boolean.aircraft_trails', 'on') else 0 }}`. Then give each aircraft rule in the enhanced dashboard
+
+```yaml
+history_start:
+  entity: sensor.aircraft_trail_minutes
+  suffix: minutes ago
+```
+
+and add a tile for `input_boolean.aircraft_trails`.
+
 Coverage depends on volunteer receivers. Low-flying aircraft in the hills, or far from Perth, can drop in and out. Not every aircraft transmits ADS-B, and an aircraft can fly under a different flight ID.
 
 ## Fire Danger Ratings
