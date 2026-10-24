@@ -74,7 +74,7 @@ The status tiles don't open the history dialog when tapped; the switches toggle.
 
 **To add one:**
 
-1. **Settings → Dashboards → Add dashboard → New dashboard from scratch**, and name it (for example *Fire and Emergencies*).
+1. **Settings → Dashboards → Add dashboard → New dashboard from scratch**, and name it (for example *Fires and Incidents*).
 2. Open the new dashboard, then ⋮ → **Edit dashboard** → ⋮ → **Raw configuration editor**.
 3. Replace everything with the contents of the YAML file and **Save**.
 

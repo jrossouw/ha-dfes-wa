@@ -1,4 +1,4 @@
-# DFES Emergency WA - "Fire and Emergencies" dashboard (enhanced)
+# DFES Emergency WA - "Fires and Incidents" dashboard (enhanced)
 #
 # Requires these HACS frontend cards: map-card (nathan-gs/ha-map-card) and
 # auto-entities (thomasloven/lovelace-auto-entities).
@@ -12,7 +12,7 @@
 # How to use: Settings > Dashboards > Add dashboard > New dashboard from scratch,
 # open it, then ⋮ > Edit dashboard > ⋮ > Raw configuration editor, paste this file and Save.
 
-title: Fire and Emergencies
+title: Fires and Incidents
 views:
 - title: Fire Map
   path: fire-map

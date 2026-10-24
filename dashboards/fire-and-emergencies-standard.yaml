@@ -1,4 +1,4 @@
-# DFES Emergency WA - "Fire and Emergencies" dashboard (standard)
+# DFES Emergency WA - "Fires and Incidents" dashboard (standard)
 #
 # Built-in cards only - nothing else to install. Tapping a pin opens its
 # details dialog. Emergency aircraft (if tracked) appear on the map with the
@@ -11,7 +11,7 @@
 # How to use: Settings > Dashboards > Add dashboard > New dashboard from scratch,
 # open it, then ⋮ > Edit dashboard > ⋮ > Raw configuration editor, paste this file and Save.
 
-title: Fire and Emergencies
+title: Fires and Incidents
 views:
 - title: Fire Map
   path: fire-map
