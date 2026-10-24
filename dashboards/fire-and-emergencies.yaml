@@ -14,7 +14,7 @@
 
 title: Fires and Incidents
 views:
-- title: Fire Map
+- title: Fires and Incidents
   path: fire-map
   icon: mdi:map-marker-alert
   type: sections
