@@ -223,3 +223,35 @@ async def test_show_all_aircraft(hass: HomeAssistant, aioclient_mock) -> None:
     await hass.async_block_till_done(wait_background_tasks=True)
     assert "geo_location.voz1234" in _aircraft_pins(hass)
     assert events == []
+
+
+
+async def test_select_aircraft_pin(hass: HomeAssistant, aioclient_mock) -> None:
+    _feeds(aioclient_mock)
+    await _setup(hass, AIRCRAFT_OPTIONS)
+
+    await hass.services.async_call(
+        DOMAIN, "select_pin", {"pin": "geo_location.bmbr611"}, blocking=True
+    )
+    await hass.async_block_till_done()
+    selected = hass.states.get("sensor.dfes_home_selected_on_map")
+    assert selected.state == "BMBR611"
+    assert selected.attributes["kind"] == "aircraft"
+    assert selected.attributes["registration"] == "VH-RIM"
+    assert selected.attributes["pin"] == "geo_location.bmbr611"
+
+    # The panel follows the aircraft between feed polls
+    moved = json.loads(json.dumps(ADSB))
+    moved["ac"][0]["alt_baro"] = 2500
+    _feeds(aioclient_mock, adsb=moved)
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=31))
+    await hass.async_block_till_done(wait_background_tasks=True)
+    assert hass.states.get("sensor.dfes_home_selected_on_map").attributes["altitude_ft"] == 2500
+
+    # It flies away -> "Cleared"
+    gone = json.loads(json.dumps(ADSB))
+    gone["ac"] = gone["ac"][1:]
+    _feeds(aioclient_mock, adsb=gone)
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=62))
+    await hass.async_block_till_done(wait_background_tasks=True)
+    assert hass.states.get("sensor.dfes_home_selected_on_map").state == "Cleared"

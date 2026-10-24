@@ -14,7 +14,7 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.const import UnitOfLength
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.util import dt as dt_util
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -157,10 +157,11 @@ class DfesSensor(DfesEntity, SensorEntity):
 
 
 class DfesSelectedSensor(DfesEntity, SensorEntity):
-    """The incident or warning last picked on the map (dfes_wa.select_pin).
+    """The incident, warning or aircraft last picked on the map (dfes_wa.select_pin).
 
-    State is the incident's name, "Cleared" once it has left the feed, or
-    unknown when nothing is selected. Details are in the attributes.
+    State is its name (an aircraft's callsign), "Cleared" once it has left
+    the feed or flown out of range, or unknown when nothing is selected.
+    Details are in the attributes; ``kind`` says which it is.
     """
 
     _attr_translation_key = "selected"
@@ -169,12 +170,24 @@ class DfesSelectedSensor(DfesEntity, SensorEntity):
     def __init__(self, coordinator) -> None:
         super().__init__(coordinator, "selected")
 
-    def _entry(self) -> FeedEntry | None:
-        data = self.coordinator.data
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        # A selected aircraft moves every ADS-B update, not every feed poll.
+        if self.coordinator.aircraft is not None:
+            self.async_on_remove(
+                self.coordinator.aircraft.async_add_listener(self._handle_aircraft_update)
+            )
+
+    @callback
+    def _handle_aircraft_update(self) -> None:
+        if (self.coordinator.selected_id or "").startswith("aircraft:"):
+            self.async_write_ha_state()
+
+    def _entry(self):
         selected = self.coordinator.selected_id
-        if data is None or selected is None:
+        if selected is None:
             return None
-        return data.get(selected)
+        return self.coordinator.lookup(selected)
 
     @property
     def native_value(self) -> str | None:

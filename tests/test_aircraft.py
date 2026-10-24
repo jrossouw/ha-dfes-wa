@@ -118,6 +118,24 @@ def test_marker_svg_points_along_heading():
     assert "rotate(0 12 12)" in north and "#e65100" in north
     assert "rotate(90 12 12)" in unquote(marker_svg("bomber", 87))  # rounded to 10
     assert "rotate(0 12 12)" in unquote(marker_svg("bomber", 358))  # wraps
-    heli = unquote(marker_svg("helitack", 180))
+    heli = unquote(marker_svg("helitack", 180, helicopter=True))
     assert "ellipse" in heli and "#c62828" in heli
-    assert "ellipse" not in unquote(marker_svg("general", 10))
+    assert "ellipse" not in unquote(marker_svg("rescue", 10))
+
+
+@pytest.mark.parametrize(
+    ("category", "type_code", "role", "expected"),
+    [
+        ("A7", None, "bomber", True),     # emitter category wins
+        ("A3", "B412", "rescue", False),
+        (None, "B412", None, True),       # then the type designator
+        (None, "CL60", "rescue", False),  # RSCU330: a Challenger jet
+        (None, None, "helitack", True),   # then the role
+        (None, None, "bomber", False),
+    ],
+)
+def test_helicopter_detection(category, type_code, role, expected):
+    plane = Aircraft(hex="1", latitude=0, longitude=0, category=category,
+                     type_code=type_code, role=role)
+    assert plane.is_helicopter is expected
+    assert ("ellipse" in __import__("urllib.parse").parse.unquote(plane.picture)) is expected

@@ -93,7 +93,7 @@ Entity IDs below assume the entry is named "DFES Home".
 | `sensor.dfes_home_nearest_warning` | km to the closest warning (0 if you're inside its area) |
 | `sensor.dfes_home_fire_danger_rating_today` | Today's Fire Danger Rating for your district |
 | `sensor.dfes_home_fire_danger_rating_tomorrow` | Tomorrow's Fire Danger Rating |
-| `sensor.dfes_home_selected_on_map` | The incident picked with `dfes_wa.select_pin` |
+| `sensor.dfes_home_selected_on_map` | The incident, warning or aircraft picked with `dfes_wa.select_pin` |
 | `sensor.dfes_home_statewide_incidents` | Total incidents in WA (disabled by default) |
 | `binary_sensor.dfes_home_fire_nearby` | A fire (not a burn off) is within the "fire nearby" radius |
 | `binary_sensor.dfes_home_watch_and_act_or_emergency_warning` | A Watch and Act or Emergency Warning is within the tracking radius |
@@ -132,12 +132,12 @@ Aircraft are recognised by the flight ID they broadcast:
 | Extra aircraft to track | – | See above |
 
 **Entities:**
-- `geo_location.<callsign>`, for example `geo_location.bmbr611`: one per emergency aircraft in range, with `kind: aircraft`, `role`, `callsign`, `registration`, `aircraft_type`, `altitude_ft`, `on_ground`, `ground_speed_kmh`, `heading`, `vertical_rate_fpm`, `squawk` and a `link` to the live track. It moves with every update and is removed when the aircraft leaves the area. Its `entity_picture` is a top-down plane (or helicopter, for helitacks and RAC Rescue) coloured by role and rotated to its heading, so map-card's `display: marker` points it in the direction of flight. Because the entity keeps its ID while the aircraft is in range, map-card's `history_start` draws its trail.
+- `geo_location.<callsign>`, for example `geo_location.bmbr611`: one per emergency aircraft in range, with `kind: aircraft`, `role`, `callsign`, `registration`, `aircraft_type`, `altitude_ft`, `on_ground`, `ground_speed_kmh`, `heading`, `vertical_rate_fpm`, `squawk` and a `link` to the live track. It moves with every update and is removed when the aircraft leaves the area. Its `entity_picture` is a top-down plane, or a helicopter for rotorcraft (by ADS-B emitter category, then type designator, then role), coloured by role and rotated to its heading, so map-card's `display: marker` points it in the direction of flight. Because the entity keeps its ID while the aircraft is in range, map-card's `history_start` draws its trail.
 - `sensor.dfes_home_emergency_aircraft_nearby`: count, with the list (nearest first) in `aircraft`.
 - `binary_sensor.dfes_home_firefighting_aircraft_nearby`: on while a bomber, helitack or air attack aircraft is within the "fire nearby" radius.
 - Event `dfes_wa_aircraft_spotted`: fired when an emergency aircraft enters the aircraft radius, with the same data as the map pin plus `in_alert_radius`, `is_firefighting` and `config_entry_id`. Aircraft already in range at startup don't fire.
 
-The enhanced dashboard points each aircraft along its heading, colours it by role and draws a 30-minute trail (other aircraft are small, grey and keep a 10-minute trail). The standard dashboard shows them automatically.
+The enhanced dashboard points each aircraft along its heading, shows its details (registration, type, altitude, speed, climb rate, squawk and a live-track link) in the **Selected on map** panel when tapped, colours it by role and draws a 30-minute trail (other aircraft are small, grey and keep a 10-minute trail). The standard dashboard shows them automatically.
 
 Coverage depends on volunteer receivers. Low-flying aircraft in the hills, or far from Perth, can drop in and out. Not every aircraft transmits ADS-B, and an aircraft can fly under a different flight ID.
 
@@ -167,10 +167,10 @@ Two actions let a map show a tapped pin's details instead of its history:
 
 | Action | What it does |
 |---|---|
-| `dfes_wa.select_pin` | Shows an incident or warning (`pin: geo_location.…`) in `sensor.dfes_home_selected_on_map` |
+| `dfes_wa.select_pin` | Shows an incident, warning or aircraft (`pin: geo_location.…`) in `sensor.dfes_home_selected_on_map` |
 | `dfes_wa.clear_selection` | Clears it again |
 
-The sensor's state is the incident name, or `Cleared` once it leaves the feed. Its attributes hold the same details as the other sensors. With map-card and auto-entities, give each pin:
+The sensor's state is the incident name (an aircraft's callsign), or `Cleared` once it leaves the feed or flies out of range. A selected aircraft's details follow it with every ADS-B update. Its attributes hold the same details as the other sensors. With map-card and auto-entities, give each pin:
 
 ```yaml
 tap_action:

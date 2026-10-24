@@ -40,9 +40,29 @@ _HELICOPTER = (
     '<ellipse cx="12" cy="9" rx="3.2" ry="4.4"/>'
 )
 HELICOPTER_ROLES = (ROLE_HELITACK, ROLE_RESCUE)
+# ICAO type designators of common helicopters (used when the feed gives no
+# emitter category). ADS-B emitter category A7 means rotorcraft.
+HELICOPTER_TYPES = frozenset({
+    "A109", "A119", "A129", "A139", "A149", "A169", "A189", "ALO2", "ALO3",
+    "AS32", "AS3B", "AS50", "AS55", "AS65", "B06", "B06T", "B105", "B212",
+    "B214", "B222", "B230", "B407", "B412", "B427", "B429", "B430", "B47G",
+    "B505", "BK17", "EC20", "EC25", "EC30", "EC35", "EC45", "EC55", "EC75",
+    "EH10", "EXPL", "G2CA", "H47", "H53", "H60", "H64", "H500", "H269",
+    "MD52", "MD60", "MI8", "NH90", "R22", "R44", "R66", "S61", "S64", "S70",
+    "S76", "S92", "SUCO", "TIGR", "UH1", "UH60",
+})
 
 
-def marker_svg(role: str | None, heading: float | None) -> str:
+def is_helicopter(category: str | None, type_code: str | None, role: str | None) -> bool:
+    """Rotorcraft by emitter category, else by type, else by role."""
+    if category:
+        return category.upper() == "A7"
+    if type_code:
+        return type_code.upper() in HELICOPTER_TYPES
+    return role in HELICOPTER_ROLES
+
+
+def marker_svg(role: str | None, heading: float | None, helicopter: bool = False) -> str:
     """A data: URI of the aircraft drawn top-down, pointing along its heading.
 
     Map-card shows an entity's picture with ``display: marker``, so this is
@@ -50,7 +70,7 @@ def marker_svg(role: str | None, heading: float | None) -> str:
     10 degrees so the picture only changes when the turn is visible.
     """
     colour = ROLE_COLOURS.get(role or "", ROLE_COLOURS[ROLE_OTHER])
-    shape = _HELICOPTER if role in HELICOPTER_ROLES else _PLANE
+    shape = _HELICOPTER if helicopter else _PLANE
     angle = 0 if heading is None else (round(heading / 10) * 10) % 360
     svg = (
         '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">'
@@ -81,6 +101,7 @@ class Aircraft:
     track: float | None = None
     vertical_rate_fpm: int | None = None
     squawk: str | None = None
+    category: str | None = None  # ADS-B emitter category, e.g. A3, A7, C1
     seen_pos: float | None = None
     role: str | None = None
     distance: float | None = None
@@ -100,8 +121,12 @@ class Aircraft:
         return round(self.ground_speed_kt * KNOTS_TO_KMH)
 
     @property
+    def is_helicopter(self) -> bool:
+        return is_helicopter(self.category, self.type_code, self.role)
+
+    @property
     def picture(self) -> str:
-        return marker_svg(self.role, self.track)
+        return marker_svg(self.role, self.track, self.is_helicopter)
 
     @property
     def link(self) -> str:
@@ -126,6 +151,7 @@ class Aircraft:
             "heading": None if self.track is None else round(self.track),
             "vertical_rate_fpm": self.vertical_rate_fpm,
             "squawk": self.squawk,
+            "helicopter": self.is_helicopter,
             "distance_km": None if self.distance is None else round(self.distance, 1),
             "link": self.link,
         }
@@ -216,6 +242,7 @@ def _build(item: dict) -> Aircraft | None:
         track=_num(item.get("track", item.get("true_heading"))),
         vertical_rate_fpm=_int(vertical),
         squawk=_clean(item.get("squawk")),
+        category=_clean(item.get("category")),
         seen_pos=seen_pos,
     )
 

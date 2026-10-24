@@ -127,6 +127,14 @@ class DfesCoordinator(DataUpdateCoordinator[DfesData]):
         # Set up in __init__.py when emergency aircraft tracking is on.
         self.aircraft: AircraftCoordinator | None = None
 
+    def lookup(self, external_id: str) -> FeedEntry | Aircraft | None:
+        """Find an incident, warning or tracked aircraft by its external id."""
+        if self.data is not None and (entry := self.data.get(external_id)):
+            return entry
+        if self.aircraft is not None and self.aircraft.data is not None:
+            return self.aircraft.data.get(external_id)
+        return None
+
     @callback
     def select(self, external_id: str | None, pin: str | None = None) -> None:
         """Remember (or clear) the map pin the user picked, and tell entities."""
