@@ -11,16 +11,53 @@ from __future__ import annotations
 from dataclasses import dataclass
 import json
 import re
+from urllib.parse import quote
 
 from .const import (
     AIRCRAFT_STALE_SECONDS,
     CALLSIGN_PATTERNS,
+    ROLE_COLOURS,
+    ROLE_HELITACK,
     ROLE_OTHER,
+    ROLE_RESCUE,
 )
 
 KNOTS_TO_KMH = 1.852
 
 _PATTERNS = tuple((role, re.compile(rx)) for role, rx in CALLSIGN_PATTERNS)
+
+
+# Top-down silhouettes in a 24x24 box, nose pointing north (up).
+_PLANE = (
+    '<path d="M12 1.8c.8 0 1.3 1 1.3 2.2v5l8 4.6v2.1l-8-2.5v5.4l2.4 1.8v1.6'
+    'l-3.7-1-3.7 1v-1.6l2.4-1.8v-5.4l-8 2.5v-2.1l8-4.6v-5c0-1.2.5-2.2 1.3-2.2z"/>'
+)
+_HELICOPTER = (
+    '<rect x="11.3" y="12.5" width="1.4" height="8.5" rx=".7"/>'
+    '<rect x="9.2" y="19.4" width="5.6" height="1.5" rx=".75"/>'
+    '<rect x="11.25" y="0.6" width="1.5" height="16.8" rx=".75" transform="rotate(45 12 9)"/>'
+    '<rect x="11.25" y="0.6" width="1.5" height="16.8" rx=".75" transform="rotate(-45 12 9)"/>'
+    '<ellipse cx="12" cy="9" rx="3.2" ry="4.4"/>'
+)
+HELICOPTER_ROLES = (ROLE_HELITACK, ROLE_RESCUE)
+
+
+def marker_svg(role: str | None, heading: float | None) -> str:
+    """A data: URI of the aircraft drawn top-down, pointing along its heading.
+
+    Map-card shows an entity's picture with ``display: marker``, so this is
+    how the map gets direction-of-flight icons. The heading is rounded to
+    10 degrees so the picture only changes when the turn is visible.
+    """
+    colour = ROLE_COLOURS.get(role or "", ROLE_COLOURS[ROLE_OTHER])
+    shape = _HELICOPTER if role in HELICOPTER_ROLES else _PLANE
+    angle = 0 if heading is None else (round(heading / 10) * 10) % 360
+    svg = (
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">'
+        f'<g transform="rotate({angle} 12 12)" fill="{colour}" stroke="#ffffff" '
+        f'stroke-width=".8" stroke-linejoin="round">{shape}</g></svg>'
+    )
+    return "data:image/svg+xml;charset=utf-8," + quote(svg, safe="")
 
 
 class AircraftParseError(Exception):
@@ -61,6 +98,10 @@ class Aircraft:
         if self.ground_speed_kt is None:
             return None
         return round(self.ground_speed_kt * KNOTS_TO_KMH)
+
+    @property
+    def picture(self) -> str:
+        return marker_svg(self.role, self.track)
 
     @property
     def link(self) -> str:

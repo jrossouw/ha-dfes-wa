@@ -3,6 +3,7 @@
 from datetime import timedelta
 import json
 import pathlib
+from urllib.parse import unquote
 
 from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant, callback
@@ -94,6 +95,9 @@ async def test_aircraft_pins_sensors_and_events(hass: HomeAssistant, aioclient_m
     assert bomber.attributes["altitude_ft"] == 1200
     assert bomber.attributes["external_id"] == "aircraft:7c6d2a"
     assert bomber.attributes["icon"] == "mdi:airplane"
+    # Top-down picture rotated to the heading (271.6 -> 270)
+    assert bomber.attributes["entity_picture"].startswith("data:image/svg+xml")
+    assert "rotate(270 12 12)" in unquote(bomber.attributes["entity_picture"])
     assert 5 < float(bomber.state) < 8  # km from home
     assert pins["geo_location.rscu651"]["on_ground"] is True
     assert pins["geo_location.vh_abc"]["role"] == "other"

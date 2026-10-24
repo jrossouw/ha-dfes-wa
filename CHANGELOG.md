@@ -8,7 +8,8 @@
 - New event: `dfes_wa_aircraft_spotted`
 - Options: aircraft radius, update interval (default 30 s), extra aircraft, and **Show all aircraft** to map every aircraft in range (sensors and events still count emergency aircraft only)
 - An ADS-B outage never affects incidents, warnings or Fire Danger Ratings
-- Enhanced dashboard: aircraft coloured by role with 30-minute trails
+- Aircraft pins carry a top-down picture rotated to the heading (`display: marker` in map-card points them in the direction of flight)
+- Enhanced dashboard: aircraft pointing along their heading, coloured by role, with 30-minute trails
 
 ## 1.0.0
 

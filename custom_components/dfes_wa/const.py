@@ -107,6 +107,18 @@ CALLSIGN_PATTERNS: Final = (
     (ROLE_POLICE, r"^(POL\d+[A-Z]?|POLAIR\d*)$"),
 )
 
+# Marker colours, matching the enhanced dashboard's trail colours.
+ROLE_COLOURS: Final = {
+    ROLE_BOMBER: "#e65100",
+    ROLE_HELITACK: "#c62828",
+    ROLE_AIR_ATTACK: "#6a1b9a",
+    ROLE_RESCUE: "#1565c0",
+    ROLE_MEDICAL: "#1565c0",
+    ROLE_POLICE: "#1565c0",
+    ROLE_OTHER: "#1565c0",
+    ROLE_GENERAL: "#616161",
+}
+
 ROLE_ICONS: Final = {
     ROLE_BOMBER: "mdi:airplane",
     ROLE_HELITACK: "mdi:helicopter",

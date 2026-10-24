@@ -5,6 +5,7 @@ import pathlib
 import pytest
 
 from dfes_wa.aircraft import (
+    marker_svg,
     Aircraft,
     AircraftParseError,
     classify,
@@ -107,3 +108,16 @@ def test_bad_responses(raw):
 def test_empty_sky():
     assert parse_aircraft(b'{"ac": [], "msg": "No error"}') == []
     assert parse_aircraft(b'{"msg": "No error", "now": 1}') == []
+
+
+def test_marker_svg_points_along_heading():
+    from urllib.parse import unquote
+
+    north = unquote(marker_svg("bomber", None))
+    assert north.startswith("data:image/svg+xml")
+    assert "rotate(0 12 12)" in north and "#e65100" in north
+    assert "rotate(90 12 12)" in unquote(marker_svg("bomber", 87))  # rounded to 10
+    assert "rotate(0 12 12)" in unquote(marker_svg("bomber", 358))  # wraps
+    heli = unquote(marker_svg("helitack", 180))
+    assert "ellipse" in heli and "#c62828" in heli
+    assert "ellipse" not in unquote(marker_svg("general", 10))

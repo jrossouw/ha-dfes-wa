@@ -216,6 +216,9 @@ class DfesAircraftEvent(CoordinatorEntity[AircraftCoordinator], GeolocationEvent
     _attr_source = SOURCE
     _attr_attribution = ADSB_ATTRIBUTION
     _attr_unit_of_measurement = UnitOfLength.KILOMETERS
+    # The picture is redrawn as the aircraft turns; no need to keep every
+    # copy in the history database (the trail only needs lat/long).
+    _unrecorded_attributes = frozenset({"entity_picture"})
 
     def __init__(self, coordinator: AircraftCoordinator, external_id: str) -> None:
         super().__init__(coordinator)
@@ -247,6 +250,12 @@ class DfesAircraftEvent(CoordinatorEntity[AircraftCoordinator], GeolocationEvent
     def icon(self) -> str | None:
         aircraft = self._aircraft
         return ROLE_ICONS.get(aircraft.role or "", "mdi:airplane") if aircraft else None
+
+    @property
+    def entity_picture(self) -> str | None:
+        """Top-down aircraft pointing along its heading (map-card `marker`)."""
+        aircraft = self._aircraft
+        return aircraft.picture if aircraft else None
 
     @property
     def latitude(self) -> float | None:
