@@ -254,7 +254,7 @@ class DfesAircraftCountSensor(DfesAircraftEntity, SensorEntity):
     @property
     def native_value(self) -> int | None:
         data = self.coordinator.data
-        return None if data is None else len(data.aircraft)
+        return None if data is None else len(data.emergency)
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
@@ -264,8 +264,9 @@ class DfesAircraftCountSensor(DfesAircraftEntity, SensorEntity):
             return attrs
         attrs["aircraft"] = [
             {k: v for k, v in a.as_dict().items() if v is not None}
-            for a in data.aircraft[:MAX_LISTED]
+            for a in data.emergency[:MAX_LISTED]
         ]
         attrs["all_aircraft_in_area"] = data.total_in_area
+        attrs["showing_all_aircraft"] = self.coordinator.show_all
         attrs["feed"] = data.source
         return attrs

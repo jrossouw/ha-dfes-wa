@@ -66,6 +66,7 @@ CONF_TRACK_AIRCRAFT: Final = "track_aircraft"
 CONF_AIRCRAFT_RADIUS: Final = "aircraft_radius"
 CONF_AIRCRAFT_SCAN_INTERVAL: Final = "aircraft_scan_interval"
 CONF_AIRCRAFT_EXTRA: Final = "aircraft_extra"
+CONF_SHOW_ALL_AIRCRAFT: Final = "show_all_aircraft"
 
 DEFAULT_AIRCRAFT_RADIUS: Final = 50.0  # km
 DEFAULT_AIRCRAFT_SCAN_INTERVAL: Final = 30  # seconds
@@ -87,10 +88,11 @@ ROLE_RESCUE: Final = "rescue"
 ROLE_MEDICAL: Final = "medical"
 ROLE_POLICE: Final = "police"
 ROLE_OTHER: Final = "other"  # matched only by the user's extra list
+ROLE_GENERAL: Final = "general"  # everything else, only with "show all aircraft"
 
 AIRCRAFT_ROLES: Final = (
     ROLE_BOMBER, ROLE_HELITACK, ROLE_AIR_ATTACK, ROLE_RESCUE,
-    ROLE_MEDICAL, ROLE_POLICE, ROLE_OTHER,
+    ROLE_MEDICAL, ROLE_POLICE, ROLE_OTHER, ROLE_GENERAL,
 )
 # Firefighting roles feed the "Firefighting aircraft nearby" binary sensor.
 FIREFIGHTING_ROLES: Final = (ROLE_BOMBER, ROLE_HELITACK, ROLE_AIR_ATTACK)
@@ -113,6 +115,7 @@ ROLE_ICONS: Final = {
     ROLE_MEDICAL: "mdi:medical-bag",
     ROLE_POLICE: "mdi:police-badge",
     ROLE_OTHER: "mdi:airplane-alert",
+    ROLE_GENERAL: "mdi:airplane",
 }
 
 # Fire Danger Ratings (Australian Fire Danger Rating System), lowest to highest.

@@ -15,6 +15,7 @@ from .const import (
     CONF_AIRCRAFT_EXTRA,
     CONF_AIRCRAFT_RADIUS,
     CONF_AIRCRAFT_SCAN_INTERVAL,
+    CONF_SHOW_ALL_AIRCRAFT,
     CONF_TRACK_AIRCRAFT,
     DEFAULT_AIRCRAFT_RADIUS,
     DEFAULT_AIRCRAFT_SCAN_INTERVAL,
@@ -111,6 +112,9 @@ def _options_schema(defaults: dict[str, Any]) -> vol.Schema:
                     mode=selector.NumberSelectorMode.BOX,
                 )
             ),
+            vol.Required(
+                CONF_SHOW_ALL_AIRCRAFT, default=defaults.get(CONF_SHOW_ALL_AIRCRAFT, False)
+            ): selector.BooleanSelector(),
             vol.Optional(
                 CONF_AIRCRAFT_EXTRA,
                 description={"suggested_value": defaults.get(CONF_AIRCRAFT_EXTRA, "")},

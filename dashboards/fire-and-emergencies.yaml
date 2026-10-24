@@ -143,6 +143,20 @@ views:
             history_line_color: '#6a1b9a'
             tap_action:
               action: more-info
+        # Other aircraft, only shown with "Show all aircraft" on: grey, shorter trail.
+        - domain: geo_location
+          attributes:
+            source: dfes_wa
+            kind: aircraft
+            role: general
+          options:
+            display: icon
+            color: '#757575'
+            size: 24
+            history_start: 10 minutes ago
+            history_line_color: '#9e9e9e'
+            tap_action:
+              action: more-info
         - domain: geo_location
           attributes:
             source: dfes_wa

@@ -25,6 +25,8 @@ from .const import (
     CONF_AIRCRAFT_RADIUS,
     CONF_AIRCRAFT_SCAN_INTERVAL,
     CONF_ALERT_RADIUS,
+    CONF_SHOW_ALL_AIRCRAFT,
+    ROLE_GENERAL,
     DEFAULT_AIRCRAFT_RADIUS,
     DEFAULT_AIRCRAFT_SCAN_INTERVAL,
     DEFAULT_ALERT_RADIUS,
@@ -286,11 +288,20 @@ class DfesCoordinator(DataUpdateCoordinator[DfesData]):
 
 @dataclass(slots=True)
 class AircraftData:
-    """Emergency aircraft inside the aircraft radius, nearest first."""
+    """Aircraft to map inside the aircraft radius, nearest first.
+
+    Normally only emergency aircraft; with "show all aircraft" on, every
+    aircraft in range, with the non-emergency ones given role "general".
+    """
 
     aircraft: list[Aircraft] = field(default_factory=list)
     total_in_area: int = 0  # every aircraft the feed returned for the area
     source: str | None = None  # which feed answered
+
+    @property
+    def emergency(self) -> list[Aircraft]:
+        """Only the emergency aircraft (what sensors and events count)."""
+        return [a for a in self.aircraft if a.role != ROLE_GENERAL]
 
     def get(self, external_id: str) -> Aircraft | None:
         for aircraft in self.aircraft:
@@ -323,6 +334,7 @@ class AircraftCoordinator(DataUpdateCoordinator[AircraftData]):
         self._parent = parent
         self._session = async_get_clientsession(hass)
         self._extra = parse_extra(entry_option(entry, CONF_AIRCRAFT_EXTRA, ""))
+        self.show_all = bool(entry_option(entry, CONF_SHOW_ALL_AIRCRAFT, False))
         self._present: set[str] | None = None  # None until the first refresh
 
     @property
@@ -367,7 +379,9 @@ class AircraftCoordinator(DataUpdateCoordinator[AircraftData]):
             in_area += 1
             role = classify(aircraft, self._extra)
             if role is None:
-                continue
+                if not self.show_all:
+                    continue
+                role = ROLE_GENERAL
             aircraft.role = role
             kept.append(aircraft)
         kept.sort(key=lambda a: a.distance or 0)
@@ -379,14 +393,15 @@ class AircraftCoordinator(DataUpdateCoordinator[AircraftData]):
         Fires once each time an aircraft enters the aircraft radius, and not
         for aircraft already there on the first refresh after startup.
         """
-        current = {a.external_id for a in data.aircraft}
+        emergency = data.emergency
+        current = {a.external_id for a in emergency}
         if self._present is None:
             self._present = current
             return
         alert_radius = float(
             entry_option(self.config_entry, CONF_ALERT_RADIUS, DEFAULT_ALERT_RADIUS)
         )
-        for aircraft in data.aircraft:
+        for aircraft in emergency:
             if aircraft.external_id in self._present:
                 continue
             payload = aircraft.as_dict()

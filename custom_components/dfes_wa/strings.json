@@ -45,7 +45,8 @@
           "track_aircraft": "Track emergency aircraft",
           "aircraft_radius": "Aircraft radius",
           "aircraft_scan_interval": "Aircraft update interval",
-          "aircraft_extra": "Extra aircraft to track"
+          "aircraft_extra": "Extra aircraft to track",
+          "show_all_aircraft": "Show all aircraft"
         },
         "data_description": {
           "incidents_url": "Only change this if Emergency WA moves its RSS feed.",
@@ -55,7 +56,8 @@
           "track_aircraft": "Show water bombers, helitacks, air attack, RAC Rescue, RFDS and police aircraft on the map, from the free adsb.lol / airplanes.live ADS-B feeds.",
           "aircraft_radius": "Emergency aircraft within this distance are mapped (up to 460 km).",
           "aircraft_scan_interval": "How often to fetch aircraft positions. Please keep it reasonable; the feeds are free community services.",
-          "aircraft_extra": "Callsigns, registrations or ICAO hex codes to track as well, separated by commas or new lines (e.g. VH-ABC, 7C1234)."
+          "aircraft_extra": "Callsigns, registrations or ICAO hex codes to track as well, separated by commas or new lines (e.g. VH-ABC, 7C1234).",
+          "show_all_aircraft": "Map every aircraft in the aircraft radius, not just emergency aircraft. Sensors, alerts and events still only count emergency aircraft."
         }
       }
     }

@@ -119,6 +119,7 @@ Aircraft are recognised by the flight ID they broadcast:
 | `medical` | `FD` + 3 digits | Royal Flying Doctor Service |
 | `police` | `POL…`, `POLAIR` | WA Police Air Wing |
 | `other` | your list | Anything in **Extra aircraft to track** |
+| `general` | – | Every other aircraft, only with **Show all aircraft** on |
 
 **Extra aircraft to track** takes callsigns, registrations (`VH-ABC`) or ICAO hex codes (`7C1234`), separated by commas or new lines. Use it for aircraft that don't broadcast a recognisable flight ID.
 
@@ -127,6 +128,7 @@ Aircraft are recognised by the flight ID they broadcast:
 | Track emergency aircraft | Off | Adds the entities below |
 | Aircraft radius | 50 km | Up to 460 km |
 | Aircraft update interval | 30 s | Minimum 15 s. Please be kind to the free feeds. |
+| Show all aircraft | Off | Map every aircraft in range, not just emergency ones. Handy for seeing it work. The sensors, alert and event still count emergency aircraft only. |
 | Extra aircraft to track | – | See above |
 
 **Entities:**
@@ -135,7 +137,7 @@ Aircraft are recognised by the flight ID they broadcast:
 - `binary_sensor.dfes_home_firefighting_aircraft_nearby`: on while a bomber, helitack or air attack aircraft is within the "fire nearby" radius.
 - Event `dfes_wa_aircraft_spotted`: fired when an emergency aircraft enters the aircraft radius, with the same data as the map pin plus `in_alert_radius`, `is_firefighting` and `config_entry_id`. Aircraft already in range at startup don't fire.
 
-The enhanced dashboard colours aircraft by role and draws a 30-minute trail. The standard dashboard shows them automatically.
+The enhanced dashboard colours aircraft by role and draws a 30-minute trail (other aircraft are small, grey and keep a 10-minute trail). The standard dashboard shows them automatically.
 
 Coverage depends on volunteer receivers. Low-flying aircraft in the hills, or far from Perth, can drop in and out. Not every aircraft transmits ADS-B, and an aircraft can fly under a different flight ID.
 

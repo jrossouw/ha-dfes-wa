@@ -189,3 +189,33 @@ async def test_turn_on_in_options(hass: HomeAssistant, aioclient_mock) -> None:
     assert "aircraft_extra" not in entry.options  # blank list isn't stored
     await hass.async_block_till_done()
     assert len(_aircraft_pins(hass)) == 5  # no extra list this time
+
+
+async def test_show_all_aircraft(hass: HomeAssistant, aioclient_mock) -> None:
+    _feeds(aioclient_mock)
+    await _setup(hass, {**AIRCRAFT_OPTIONS, "show_all_aircraft": True})
+
+    pins = _aircraft_pins(hass)
+    # All 7 in range get a pin: the 6 emergency/extra ones plus the airliner
+    assert len(pins) == 7
+    assert pins["geo_location.qfa781"]["role"] == "general"
+    assert hass.states.get("geo_location.qfa781").attributes["icon"] == "mdi:airplane"
+    # Sensors still count emergency aircraft only
+    count = hass.states.get("sensor.dfes_home_emergency_aircraft_nearby")
+    assert count.state == "6"
+    assert count.attributes["showing_all_aircraft"] is True
+    assert "QFA781" not in [a.get("callsign") for a in count.attributes["aircraft"]]
+
+    # A new airliner arriving doesn't fire the emergency event
+    events = []
+    hass.bus.async_listen(EVENT_AIRCRAFT_SPOTTED, callback(lambda e: events.append(e)))
+    more = json.loads(json.dumps(ADSB))
+    more["ac"].append(
+        {"hex": "7c5555", "flight": "VOZ1234", "r": "VH-YIA", "t": "B738",
+         "alt_baro": 9000, "lat": -31.70, "lon": 115.99, "seen_pos": 1}
+    )
+    _feeds(aioclient_mock, adsb=more)
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=31))
+    await hass.async_block_till_done(wait_background_tasks=True)
+    assert "geo_location.voz1234" in _aircraft_pins(hass)
+    assert events == []
