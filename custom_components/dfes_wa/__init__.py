@@ -8,7 +8,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 
-from .const import CONF_TRACK_AIRCRAFT, DOMAIN
+from .const import CONF_SHOW_ALL_AIRCRAFT, CONF_TRACK_AIRCRAFT, DOMAIN
 from .coordinator import AircraftCoordinator, DfesCoordinator, entry_option
 from .services import async_setup_services
 
@@ -16,7 +16,12 @@ PLATFORMS: list[Platform] = [
     Platform.GEO_LOCATION,
     Platform.SENSOR,
     Platform.BINARY_SENSOR,
+    Platform.SWITCH,
 ]
+
+# Options that can change without reloading the entry (the dashboard switch
+# for "show all aircraft" flips this one).
+LIVE_OPTIONS = frozenset({CONF_SHOW_ALL_AIRCRAFT})
 
 type DfesConfigEntry = ConfigEntry[DfesCoordinator]
 
@@ -42,6 +47,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: DfesConfigEntry) -> bool
         await coordinator.aircraft.async_refresh()
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    coordinator.options_snapshot = dict(entry.options)
     entry.async_on_unload(entry.add_update_listener(_async_reload))
     return True
 
@@ -52,5 +58,13 @@ async def async_unload_entry(hass: HomeAssistant, entry: DfesConfigEntry) -> boo
 
 
 async def _async_reload(hass: HomeAssistant, entry: DfesConfigEntry) -> None:
-    """Reload when options change."""
+    """Reload when options change, unless only a live option changed."""
+    coordinator = entry.runtime_data
+    new = dict(entry.options)
+    old = coordinator.options_snapshot
+    changed = {k for k in old.keys() | new.keys() if old.get(k) != new.get(k)}
+    coordinator.options_snapshot = new
+    if changed and changed <= LIVE_OPTIONS and coordinator.aircraft is not None:
+        coordinator.aircraft.set_show_all(bool(new.get(CONF_SHOW_ALL_AIRCRAFT, False)))
+        return
     await hass.config_entries.async_reload(entry.entry_id)

@@ -126,6 +126,8 @@ class DfesCoordinator(DataUpdateCoordinator[DfesData]):
         self._fdr_fetched: datetime | None = None
         # Set up in __init__.py when emergency aircraft tracking is on.
         self.aircraft: AircraftCoordinator | None = None
+        # Options at setup, to tell a live option change from one needing a reload.
+        self.options_snapshot: dict = {}
 
     def lookup(self, external_id: str) -> FeedEntry | Aircraft | None:
         """Find an incident, warning or tracked aircraft by its external id."""
@@ -350,6 +352,14 @@ class AircraftCoordinator(DataUpdateCoordinator[AircraftData]):
         return float(
             entry_option(self.config_entry, CONF_AIRCRAFT_RADIUS, DEFAULT_AIRCRAFT_RADIUS)
         )
+
+    @callback
+    def set_show_all(self, show_all: bool) -> None:
+        """Switch between all aircraft and emergency aircraft only, live."""
+        if show_all == self.show_all:
+            return
+        self.show_all = show_all
+        self.hass.async_create_task(self.async_refresh())
 
     def _urls(self) -> list[str]:
         radius_nm = min(ADSB_MAX_RADIUS_NM, max(1, math.ceil(self.radius / 1.852)))

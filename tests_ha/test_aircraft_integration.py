@@ -255,3 +255,33 @@ async def test_select_aircraft_pin(hass: HomeAssistant, aioclient_mock) -> None:
     async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=62))
     await hass.async_block_till_done(wait_background_tasks=True)
     assert hass.states.get("sensor.dfes_home_selected_on_map").state == "Cleared"
+
+
+async def test_show_all_switch_applies_live(hass: HomeAssistant, aioclient_mock) -> None:
+    _feeds(aioclient_mock)
+    entry = await _setup(hass, AIRCRAFT_OPTIONS)
+    switch = "switch.dfes_home_show_all_aircraft"
+    assert hass.states.get(switch) is not None, hass.states.async_entity_ids("switch")
+    assert hass.states.get(switch).state == "off"
+    assert "geo_location.qfa781" not in _aircraft_pins(hass)
+    pin_before = hass.states.get("geo_location.burn_off_muchea").last_changed
+
+    await hass.services.async_call("switch", "turn_on", {"entity_id": switch}, blocking=True)
+    await hass.async_block_till_done(wait_background_tasks=True)
+
+    assert hass.states.get(switch).state == "on"
+    assert entry.options["show_all_aircraft"] is True  # saved to the options
+    assert "geo_location.qfa781" in _aircraft_pins(hass)
+    # Applied live, without a reload (a reload would recreate every pin)
+    assert hass.states.get("geo_location.burn_off_muchea").last_changed == pin_before
+
+    await hass.services.async_call("switch", "turn_off", {"entity_id": switch}, blocking=True)
+    await hass.async_block_till_done(wait_background_tasks=True)
+    assert hass.states.get(switch).state == "off"
+    assert "geo_location.qfa781" not in _aircraft_pins(hass)
+
+
+async def test_no_switch_without_aircraft_tracking(hass: HomeAssistant, aioclient_mock) -> None:
+    _feeds(aioclient_mock)
+    await _setup(hass, {"radius": 50})
+    assert hass.states.get("switch.dfes_home_show_all_aircraft") is None

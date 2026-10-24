@@ -122,6 +122,11 @@
       "firefighting_aircraft_nearby": {
         "name": "Firefighting aircraft nearby"
       }
+    },
+    "switch": {
+      "show_all_aircraft": {
+        "name": "Show all aircraft"
+      }
     }
   },
   "services": {

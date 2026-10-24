@@ -134,6 +134,7 @@ Aircraft are recognised by the flight ID they broadcast:
 **Entities:**
 - `geo_location.<callsign>`, for example `geo_location.bmbr611`: one per emergency aircraft in range, with `kind: aircraft`, `role`, `callsign`, `registration`, `aircraft_type`, `altitude_ft`, `on_ground`, `ground_speed_kmh`, `heading`, `vertical_rate_fpm`, `squawk` and a `link` to the live track. It moves with every update and is removed when the aircraft leaves the area. Its `entity_picture` is a top-down plane, or a helicopter for rotorcraft (by ADS-B emitter category, then type designator, then role), coloured by role and rotated to its heading, so map-card's `display: marker` points it in the direction of flight. Because the entity keeps its ID while the aircraft is in range, map-card's `history_start` draws its trail.
 - `sensor.dfes_home_emergency_aircraft_nearby`: count, with the list (nearest first) in `aircraft`.
+- `switch.dfes_home_show_all_aircraft`: the **Show all aircraft** option as a switch, for a dashboard. It applies straight away without reloading, and saves to the integration options.
 - `binary_sensor.dfes_home_firefighting_aircraft_nearby`: on while a bomber, helitack or air attack aircraft is within the "fire nearby" radius.
 - Event `dfes_wa_aircraft_spotted`: fired when an emergency aircraft enters the aircraft radius, with the same data as the map pin plus `in_alert_radius`, `is_firefighting` and `config_entry_id`. Aircraft already in range at startup don't fire.
 
