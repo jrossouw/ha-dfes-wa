@@ -219,11 +219,6 @@ views:
         #       opacity: 0.6
         #       maxZoom: 16
         #       attribution: Wind &copy; <a href="https://openweathermap.org/">OpenWeatherMap</a>
-  - type: grid
-    cards:
-    - type: heading
-      heading: Status
-      icon: mdi:alert-circle-outline
     - type: heading
       heading: Selected on map
       heading_style: subtitle
@@ -281,6 +276,11 @@ views:
         {% endif %}
         {% if a.link %}[Full details on Emergency WA →]({{ a.link }}){% endif %}
         {%- endif %}
+  - type: grid
+    cards:
+    - type: heading
+      heading: Status
+      icon: mdi:alert-circle-outline
     - type: tile
       entity: sensor.dfes_home_incidents_nearby
       name: Active incidents
